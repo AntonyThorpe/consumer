@@ -1,0 +1,51 @@
+UserMock:
+  um1:
+    Name: Will Be Updated
+    UserName: Will Be Updated
+    Email: Sincere@april.biz
+    Phone: Will Be Updated
+    Website: Will Be Updated
+    Guid: 1
+  um2:
+    Name: Will Be Updated
+    UserName: Will Be Updated
+    Email: Shanna@melissa.tv
+    Phone: Will Be Updated
+    Website: Will Be Updated
+    Guid: 2
+  um3:
+    Name: Clementine Will be changed
+    UserName: Samantha
+    Email: Nathan@yesenia.net
+    Phone: 1-463-123-4447
+    Website: ramiro.info
+    Guid: 3
+  um4:
+    Name: Patricia Lebsack
+    UserName: Karianne
+    Email: Julianne.OConner@kory.org
+    Phone: 493-170-9623 x156
+    Website: kale.biz
+    Guid: 4
+  um5:
+    Name: Chelsey Dietrich
+    UserName: Kamren
+    Email: Lucio_Hettinger@annie.ca
+    Phone: (254)954-1289
+    Website: demarco.info
+    Guid: 5
+  um6:
+    Name: Will Not Be Found In The External API or in Consumer Subclass
+    UserName: LocalOnly
+    Email: LocalOnly@local.net
+    Phone: 954-1289
+    Website: local.info
+    Guid: 99999
+
+
+
+
+
+
+
+
