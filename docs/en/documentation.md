@@ -14,7 +14,7 @@ class Product extends Page
 ```
 
 ## Subclass the ConsumerBulkLoader class
-Set your column map between the external API fields and the dataobject (see [burnbright/silverstripe-importexport](https://github.com/burnbright/silverstripe-importexport) for advanced settings, like Relations/callbacks for each API data row).
+Set your column map between the external API fields and the dataobject (see tests for advanced settings, like Relations/callbacks for each API data row).
 ```php
 class ProductBulkLoader extends ConsumerBulkLoader
 {
@@ -35,7 +35,7 @@ class ProductBuildTaskExample extends BuildTask
 {
     public function run($request)
     {
-        // $response = call to external API to get products;  
+        // $response = call to external API to get products;
         // below code assumes the use of Guzzle(http://docs.guzzlephp.org/en/latest/)
         if ($response->getStatusCode() == '200' && $apidata = json_decode($response->getBody()->getContents(), true)) {
             $loader = ProductBulkLoader::create('Product');
@@ -90,7 +90,6 @@ To preview the Bulk Loader Results without altering the dataobject, add `true` a
 ```
 
 ## ConsumerBulkLoader Methods
-The below are additional methods to those within the [BetterBulkLoader](https://github.com/burnbright/silverstripe-importexport/blob/master/code/bulkloader/BetterBulkLoader.php) parent class:
 * `updateRecords` - update a record if it exists
 * `upsertManyRecords` - update an existing record or create a new one
 * `deleteManyRecords` - delete the dataobjects matched to the supplied data
@@ -125,4 +124,3 @@ $consumer = Product::get()->find('Title', 'ProductUpdate');
 $date = new DateTime($consumer->ExternalLastEdited);
 $modified_since = substr($date->format('Y-m-d\TH:i:s.u'), 0, 23);  // use this variable to limit the next call.
 ```
-

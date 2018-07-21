@@ -13,5 +13,4 @@ Consumer:
   publishPages: false  # don't stage to Live
 ```
 
-
 See the [Documentation](documentation.md) for the next step.
