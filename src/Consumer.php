@@ -1,5 +1,11 @@
 <?php
 
+namespace AntonyThorpe\Consumer;
+
+use SilverStripe\ORM\DataObject;
+use DateTime;
+use Exception;
+
 /**
  * Consumer
  *
@@ -7,6 +13,8 @@
  */
 class Consumer extends DataObject
 {
+    private static $table_name = 'Consumer';
+
     /**
      * ExternalLastEdited is the last modified date from the external API data.
      * Save the maximum data using setExternalLastEdited method.  Can use it to filter future calls to the API.
@@ -15,7 +23,7 @@ class Consumer extends DataObject
     private static $db = array(
         'Title' => 'Varchar(250)',
         'ExternalLastEditedKey' => 'Varchar(100)',
-        'ExternalLastEdited' => 'SS_Datetime'
+        'ExternalLastEdited' => 'Datetime'
     );
 
     public static function convertUnix2UTC($data)

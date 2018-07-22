@@ -1,4 +1,4 @@
-BulkLoaderTest_Country:
+AntonyThorpe\Consumer\Tests\BulkLoaderTest_Country:
   nz:
     Title: New Zealand
     Code: NZ

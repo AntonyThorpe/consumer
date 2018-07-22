@@ -1,5 +1,10 @@
 <?php
 
+namespace AntonyThorpe\Consumer\Tests;
+
+use SilverStripe\Control\Email\Email;
+use SilverStripe\Dev\SapphireTest;
+
 class ConsumerBulkLoaderDeleteManyRecordsTest extends SapphireTest
 {
     protected static $fixture_file = array(
@@ -12,8 +17,8 @@ class ConsumerBulkLoaderDeleteManyRecordsTest extends SapphireTest
 
     public function testDeleteManyRecords()
     {
-        $shanna = UserMock::get()->find('Email', 'Shanna@melissa.tv');
-        $nathan = UserMock::get()->find('Email', 'Nathan@yesenia.net');
+        $shanna = UserMock::get()->find(Email::class, 'Shanna@melissa.tv');
+        $nathan = UserMock::get()->find(Email::class, 'Nathan@yesenia.net');
         $this->assertTrue($shanna->exists(), 'Shanna exists in UserMock');
         $this->assertTrue($nathan->exists(), 'Nathan exists in UserMock');
 
@@ -45,20 +50,20 @@ class ConsumerBulkLoaderDeleteManyRecordsTest extends SapphireTest
 
         // Check Dataobjects
         $this->assertNull(
-            UserMock::get()->find('Email', 'Shanna@melissa.tv'),
+            UserMock::get()->find(Email::class, 'Shanna@melissa.tv'),
             'Shanna@melissa.tv should not exist as a dataobject in UserMock after been deleted'
         );
         $this->assertNull(
-            UserMock::get()->find('Email', 'Nathan@yesenia.net'),
+            UserMock::get()->find(Email::class, 'Nathan@yesenia.net'),
             'Nathan@yesenia.net should not exist as a dataobject in UserMock after been deleted'
         );
 
         $this->assertTrue(
-            UserMock::get()->find('Email', 'Lucio_Hettinger@annie.ca')->exists(),
+            UserMock::get()->find(Email::class, 'Lucio_Hettinger@annie.ca')->exists(),
             'Lucio_Hettinger@annie.ca still exists in the UserMock as we did not ask for it to be deleted'
         );
         $this->assertNull(
-            UserMock::get()->find('Email', 'shouldnotchangeorbedeleted@net.net'),
+            UserMock::get()->find(Email::class, 'shouldnotchangeorbedeleted@net.net'),
             'shouldnotchangeorbedeleted@net.net was never in a dataobject so should not appear'
         );
         $this->assertEquals(
@@ -80,10 +85,10 @@ class ConsumerBulkLoaderDeleteManyRecordsTest extends SapphireTest
             'Total instances of UserMock is unchanged'
         );
 
-        $remains = UserMock::get()->find('Email', 'Nathan@yesenia.net');
+        $remains = UserMock::get()->find(Email::class, 'Nathan@yesenia.net');
         $this->assertSame($remains->Email, 'Nathan@yesenia.net', 'Nathan@yesenia.net not removed from UserMock');
 
-        $remains = UserMock::get()->find('Email', 'Shanna@melissa.tv');
+        $remains = UserMock::get()->find(Email::class, 'Shanna@melissa.tv');
         $this->assertSame($remains->Email, 'Shanna@melissa.tv', 'Shanna@melissa.tv not removed from UserMock');
     }
 

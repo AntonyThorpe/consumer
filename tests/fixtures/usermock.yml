@@ -1,4 +1,4 @@
-UserMock:
+AntonyThorpe\Consumer\Tests\UserMock:
   um1:
     Name: Will Be Updated
     UserName: Will Be Updated
@@ -41,11 +41,3 @@ UserMock:
     Phone: 954-1289
     Website: local.info
     Guid: 99999
-
-
-
-
-
-
-
-

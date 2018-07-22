@@ -1,7 +1,9 @@
 <?php
 
-class Utilities {
+namespace AntonyThorpe\Consumer;
 
+class Utilities
+{
     /**
      * get duplicates in an array
      *
@@ -11,6 +13,5 @@ class Utilities {
     public static function getDuplicates($data = array())
     {
         return array_unique(array_diff_assoc($data, array_unique($data)));
-
     }
 }

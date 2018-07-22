@@ -1,4 +1,4 @@
-ProductMock:
+AntonyThorpe\Consumer\Tests\ProductMock:
   products:
     Title: Shop
     URLSegment: shop
@@ -32,8 +32,3 @@ ProductMock:
     Parent: =>ProductMock.products
     ShowInMenus: 1
     ShowInSearch: 0
-
-
-
-
-

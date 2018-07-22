@@ -1,5 +1,9 @@
 <?php
 
+namespace AntonyThorpe\Consumer\Tests;
+
+use SilverStripe\Dev\TestOnly;
+
 class ProductMock extends Page implements TestOnly
 {
     private static $db = array(

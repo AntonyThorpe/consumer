@@ -1,5 +1,10 @@
 <?php
 
+namespace AntonyThorpe\Consumer\Tests;
+
+use SilverStripe\Control\Email\Email;
+use SilverStripe\Dev\SapphireTest;
+
 class ConsumerBulkLoaderUpsertManyRecordsTest extends SapphireTest
 {
     protected static $fixture_file = array('consumer/tests/fixtures/usermock.yml');
@@ -38,27 +43,27 @@ class ConsumerBulkLoaderUpsertManyRecordsTest extends SapphireTest
         $this->assertEquals(7, UserMock::get()->Count(), '7 instances in UserMock');
         $this->assertSame(
             'New Name',
-            UserMock::get()->find('Email', 'Shanna@melissa.tv')->Name,
+            UserMock::get()->find(Email::class, 'Shanna@melissa.tv')->Name,
             'Shanna@melissa.tv Name should be New Name'
         );
         $this->assertSame(
             'New Phone Number',
-            UserMock::get()->find('Email', 'Shanna@melissa.tv')->Phone,
+            UserMock::get()->find(Email::class, 'Shanna@melissa.tv')->Phone,
             'Shanna@melissa.tv Phone should be New Phone Number'
         );
         $this->assertSame(
             'NewUserName',
-            UserMock::get()->find('Email', 'Nathan@yesenia.net')->UserName,
+            UserMock::get()->find(Email::class, 'Nathan@yesenia.net')->UserName,
             'Nathan@yesenia.net should have a UserName of NewUserName'
         );
         $this->assertSame(
             'Brand new guy',
-            UserMock::get()->find('Email', 'brandnewguy@net.net')->Name,
+            UserMock::get()->find(Email::class, 'brandnewguy@net.net')->Name,
             'brandnewguy@net.net should be a new dataobject'
         );
         $this->assertSame(
             'Welcome to the dataobject',
-            UserMock::get()->find('Email', 'brandnewguy@net.net')->UserName,
+            UserMock::get()->find(Email::class, 'brandnewguy@net.net')->UserName,
             'brandnewguy@net.net should be a new dataobject'
         );
     }
@@ -68,7 +73,7 @@ class ConsumerBulkLoaderUpsertManyRecordsTest extends SapphireTest
         $apidata = json_decode($this->jsondata_to_upsert, true);
         UserBulkLoaderMock::create("UserMock")->upsertManyRecords($apidata, true);
 
-        $remains = UserMock::get()->find('Email', 'Sincere@april.biz');
+        $remains = UserMock::get()->find(Email::class, 'Sincere@april.biz');
         $this->assertSame(
             'Will Be Updated',
             $remains->Name,
@@ -80,7 +85,7 @@ class ConsumerBulkLoaderUpsertManyRecordsTest extends SapphireTest
             'Sincere@april.biz Phone not updated'
         );
 
-        $remains = UserMock::get()->find('Email', 'Shanna@melissa.tv');
+        $remains = UserMock::get()->find(Email::class, 'Shanna@melissa.tv');
         $this->assertSame(
             'Will Be Updated',
             $remains->Name,
@@ -93,7 +98,7 @@ class ConsumerBulkLoaderUpsertManyRecordsTest extends SapphireTest
         );
 
         $this->assertNull(
-            UserMock::get()->find('Email', 'brandnewguy@net.net'),
+            UserMock::get()->find(Email::class, 'brandnewguy@net.net'),
             'brandnewguy@net.net has not been created'
         );
     }

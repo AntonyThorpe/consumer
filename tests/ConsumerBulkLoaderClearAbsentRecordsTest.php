@@ -1,5 +1,10 @@
 <?php
 
+namespace AntonyThorpe\Consumer\Tests;
+
+use SilverStripe\Control\Email\Email;
+use SilverStripe\Dev\SapphireTest;
+
 class ConsumerBulkLoaderClearAbsentRecordsTest extends SapphireTest
 {
     protected static $fixture_file = array('consumer/tests/fixtures/usermock.yml');
@@ -25,13 +30,13 @@ class ConsumerBulkLoaderClearAbsentRecordsTest extends SapphireTest
         );
 
         // Check Dataobjects
-        $obj = UserMock::get()->find('Email', 'LocalOnly@local.net');
+        $obj = UserMock::get()->find(Email::class, 'LocalOnly@local.net');
         $this->assertEmpty(
             $obj->Guid,
             'LocalOnly@local.net Should have nothing in the Guid field'
         );
 
-        $obj = UserMock::get()->find('Email', 'Sincere@april.biz');
+        $obj = UserMock::get()->find(Email::class, 'Sincere@april.biz');
         $this->assertSame(
             '1',
             $obj->Guid,
@@ -44,7 +49,7 @@ class ConsumerBulkLoaderClearAbsentRecordsTest extends SapphireTest
         $apidata = json_decode($this->jsondata, true);
         UserBulkLoaderMock::create("UserMock")->clearAbsentRecords($apidata, 'guid', 'Guid', true);
 
-        $item = UserMock::get()->find('Email', 'LocalOnly@local.net');
+        $item = UserMock::get()->find(Email::class, 'LocalOnly@local.net');
         $this->assertSame(
             '99999',
             $item->Guid,

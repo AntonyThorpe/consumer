@@ -1,5 +1,10 @@
 <?php
 
+namespace AntonyThorpe\Consumer\Tests;
+
+use SilverStripe\Dev\TestOnly;
+use SilverStripe\ORM\DataObject;
+
 class UserMock extends DataObject implements TestOnly
 {
     private static $db = array(

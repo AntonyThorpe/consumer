@@ -6,14 +6,20 @@
 	"extra": {
 		"installer-name": "consumer",
 		"branch-alias": {
-			"dev-master": "1.*-dev"
+			"dev-master": "2.*-dev"
 		}
 	},
 	"require": {
-		"silverstripe/cms": "^3.4.1"
+		"silverstripe/recipe-cms": "^4.1"
 	},
 	"require-dev": {
-		"phpunit/PHPUnit": "3.7.*@stable"
+		"phpunit/phpunit": "^5.7"
 	},
+    "autoload": {
+        "psr-4": {
+            "AntonyThorpe\\Consumer\\": "src/",
+            "AntonyThorpe\\Consumer\\Tests\\": "tests/"
+        }
+    },
 	"license": "MIT"
 }

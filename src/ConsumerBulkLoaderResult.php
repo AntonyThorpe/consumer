@@ -1,5 +1,11 @@
 <?php
 
+namespace AntonyThorpe\Consumer;
+
+use SilverStripe\Dev\BulkLoader_Result;
+use SilverStripe\ORM\ArrayList;
+use SilverStripe\View\ArrayData;
+
 /**
  * Store result information about a BulkLoader import
  * Overrides BulkLoader settings
@@ -42,35 +48,35 @@ class ConsumerBulkLoaderResult extends BulkLoader_Result
         $output =  array();
         if ($this->CreatedCount()) {
             $output['created'] = _t(
-                'BulkLoader.IMPORTEDRECORDS',
+                'SilverStripe\\Dev\\BulkLoader.IMPORTEDRECORDS',
                 "Imported {count} new records.",
                 array('count' => $this->CreatedCount())
             );
         }
         if ($this->UpdatedCount()) {
             $output['updated'] = _t(
-                'BulkLoader.UPDATEDRECORDS',
+                'SilverStripe\\Dev\\BulkLoader.UPDATEDRECORDS',
                 "Updated {count} records.",
                 array('count' => $this->UpdatedCount())
             );
         }
         if ($this->DeletedCount()) {
             $output['deleted'] =  _t(
-                'BulkLoader.DELETEDRECORDS',
+                'SilverStripe\\Dev\\BulkLoader.DELETEDRECORDS',
                 "Deleted {count} records.",
                 array('count' => $this->DeletedCount())
             );
         }
         if ($this->SkippedCount()) {
             $output['skipped'] =  _t(
-                'BulkLoader.SKIPPEDRECORDS',
+                'SilverStripe\\Dev\\BulkLoader.SKIPPEDRECORDS',
                 "Skipped {count} bad records.",
                 array('count' => $this->SkippedCount())
             );
         }
 
         if (!$this->CreatedCount() && !$this->UpdatedCount()) {
-            $output['empty'] = _t('BulkLoader.NOIMPORT', "Nothing to import");
+            $output['empty'] = _t('SilverStripe\\Dev\\BulkLoader.NOIMPORT', "Nothing to import");
         }
 
         return $output;

@@ -1,8 +1,12 @@
 <?php
 
+namespace AntonyThorpe\Consumer\Tests;
+
+use SilverStripe\Dev\SapphireTest;
+use AntonyThorpe\Consumer\ArrayBulkLoaderSource;
+
 class ConsumerArrayBulkLoaderSourceTest extends SapphireTest
 {
-
     public function testIterator()
     {
         $data = array(

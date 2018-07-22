@@ -1,5 +1,12 @@
 <?php
 
+namespace AntonyThorpe\Consumer\Tests;
+
+use AntonyThorpe\Consumer\ConsumerBulkLoader;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Dev\TestOnly;
+use SilverStripe\ORM\DataObject;
+
 class ConsumerBulkLoaderTest extends SapphireTest
 {
     protected static $fixture_file = 'consumer/tests/fixtures/BulkLoaderTest.yaml';

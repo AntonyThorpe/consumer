@@ -1,5 +1,10 @@
 <?php
 
+namespace AntonyThorpe\Consumer\Tests;
+
+use SilverStripe\Dev\SapphireTest;
+use AntonyThorpe\Consumer\Consumer;
+
 class ConsumerModelTest extends SapphireTest
 {
     public function testCreateUpdate()
@@ -94,7 +99,7 @@ class ConsumerModelTest extends SapphireTest
      * Additional JSON data for testing
      * @var string
      */
-     protected $jsondata2 = '[
+    protected $jsondata2 = '[
         {
             "id": 1,
             "lastmodified": "/Date(1333699439)/"
@@ -113,7 +118,7 @@ class ConsumerModelTest extends SapphireTest
      * Additional JSON data for testing
      * @var string
      */
-     protected $jsondata3 = '[
+    protected $jsondata3 = '[
         {
             "id": 1,
             "lastmodified": "/Date(1333699439123)/"

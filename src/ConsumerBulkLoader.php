@@ -1,4 +1,16 @@
 <?php
+
+namespace AntonyThorpe\Consumer;
+
+use SilverStripe\Dev\BulkLoader;
+use SilverStripe\CMS\Model\SiteTree;
+use Exception;
+use SilverStripe\ORM\ValidationException;
+use SilverStripe\ORM\DataObject;
+use BulkLoaderSource;
+use ConsumerBulkLoaderResult;
+use ArrayBulkLoaderSource;
+
 /**
  * The bulk loader allows large-scale uploads to SilverStripe via the ORM.
  *
@@ -132,6 +144,19 @@ class ConsumerBulkLoader extends BulkLoader
     {
         $class = $this->objectClass;
         return $class::get();
+    }
+
+    /**
+     * Preview a file import (don't write anything to the database).
+     * Useful to analyze the input and give the users a chance to influence
+     * it through a UI.
+     *
+     * @param string $filepath Absolute path to the file we're importing
+     * @return array See {@link self::processAll()}
+     */
+    public function preview($filepath)
+    {
+        return null;
     }
 
 
@@ -356,9 +381,12 @@ class ConsumerBulkLoader extends BulkLoader
                 $relationName = $field;
             }
             //get the list that relation is added to/checked on
-            $relationlist = isset($this->transforms[$field]['list']) &&
-                            $this->transforms[$field]['list'] instanceof SS_List ?
-                            $this->transforms[$field]['list'] : null;
+            if (isset($this->transforms[$field]['list'])) {
+                $relationlist = $this->transforms[$field]['list'];
+            } else {
+                $relationlist = null;
+            }
+
             //check for the same relation set on the current record
             if ($placeholder->{$relationName."ID"}) {
                 $relation = $placeholder->{$relationName}();

@@ -1,5 +1,10 @@
 <?php
 
+namespace AntonyThorpe\Consumer\Tests;
+
+use SilverStripe\Control\Email\Email;
+use SilverStripe\Dev\SapphireTest;
+
 class ConsumerBulkLoaderUpdateRecordsTest extends SapphireTest
 {
     protected static $fixture_file = array(
@@ -47,7 +52,7 @@ class ConsumerBulkLoaderUpdateRecordsTest extends SapphireTest
         );
 
         // Check Dataobjects
-        $obj = UserMock::get()->find('Email', 'Sincere@april.biz');
+        $obj = UserMock::get()->find(Email::class, 'Sincere@april.biz');
         $this->assertSame(
             'Leanne Graham',
             $obj->Name,
@@ -64,7 +69,7 @@ class ConsumerBulkLoaderUpdateRecordsTest extends SapphireTest
             'Should have changed the Phone number of Sincere@april.biz to 1-770-736-8031 x56442'
         );
 
-        $obj_untouched = UserMock::get()->find('Email', 'LocalOnly@local.net');
+        $obj_untouched = UserMock::get()->find(Email::class, 'LocalOnly@local.net');
         $this->assertEquals(
             1,
             count($obj_untouched),
@@ -77,7 +82,7 @@ class ConsumerBulkLoaderUpdateRecordsTest extends SapphireTest
         );
 
         $this->assertNull(
-            UserMock::get()->find('Email', 'Rey.Padberg@karina.biz'),
+            UserMock::get()->find(Email::class, 'Rey.Padberg@karina.biz'),
             'Rey.Padberg@karina.biz has not been accidently created'
         );
     }
@@ -94,7 +99,7 @@ class ConsumerBulkLoaderUpdateRecordsTest extends SapphireTest
             'Total instances of UserMock is unchanged'
         );
 
-        $remains = UserMock::get()->find('Email', 'Sincere@april.biz');
+        $remains = UserMock::get()->find(Email::class, 'Sincere@april.biz');
         $this->assertSame(
             'Will Be Updated',
             $remains->Name,
@@ -106,7 +111,7 @@ class ConsumerBulkLoaderUpdateRecordsTest extends SapphireTest
             'Sincere@april.biz Phone not updated'
         );
 
-        $remains = UserMock::get()->find('Email', 'Shanna@melissa.tv');
+        $remains = UserMock::get()->find(Email::class, 'Shanna@melissa.tv');
         $this->assertSame(
             'Will Be Updated',
             $remains->Name,

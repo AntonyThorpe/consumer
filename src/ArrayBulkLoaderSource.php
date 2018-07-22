@@ -1,5 +1,9 @@
 <?php
 
+namespace AntonyThorpe\Consumer;
+
+use ArrayIterator;
+
 /**
  * Array Bulk Loader Source
  * Useful for testing bulk loader. The output is the same as input.
