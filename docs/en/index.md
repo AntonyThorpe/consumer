@@ -2,4 +2,5 @@
 
 * [Installation ](installationconfiguration.md)
 * [Documentation](documentation.md)
-* [Contributing](contributing.md)
+* [Upgrading](upgrading.md)
+* [Code of Conduct](codeofconduct.md)

@@ -20,11 +20,11 @@ class Consumer extends DataObject
      * Save the maximum data using setExternalLastEdited method.  Can use it to filter future calls to the API.
      * @var array
      */
-    private static $db = array(
+    private static $db = [
         'Title' => 'Varchar(250)',
         'ExternalLastEditedKey' => 'Varchar(100)',
         'ExternalLastEdited' => 'Datetime'
-    );
+    ];
 
     public static function convertUnix2UTC($data)
     {
@@ -74,7 +74,7 @@ class Consumer extends DataObject
         // Validation
         if (!$external_last_edited_key) {
             user_error(
-                "Property ExternalLastEditedKey needs to be set before calling setMaxExternalLastEdited method",
+                _t('Consumer.ExternalLastEditedKeyNeeded', 'Property ExternalLastEditedKey needs to be set before calling setMaxExternalLastEdited method'),
                 E_USER_WARNING
             );
         }

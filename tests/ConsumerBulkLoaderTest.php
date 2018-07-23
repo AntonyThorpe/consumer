@@ -2,23 +2,24 @@
 
 namespace AntonyThorpe\Consumer\Tests;
 
-use AntonyThorpe\Consumer\ConsumerBulkLoader;
 use SilverStripe\Dev\SapphireTest;
-use SilverStripe\Dev\TestOnly;
-use SilverStripe\ORM\DataObject;
+use AntonyThorpe\Consumer\BulkLoader;
+use AntonyThorpe\Consumer\ArrayBulkLoaderSource;
+use AntonyThorpe\Consumer\Tests\Person;
+use AntonyThorpe\Consumer\Tests\Country;
 
-class ConsumerBulkLoaderTest extends SapphireTest
+class BulkLoaderTest extends SapphireTest
 {
-    protected static $fixture_file = 'consumer/tests/fixtures/BulkLoaderTest.yaml';
+    protected static $fixture_file = 'fixtures/BulkLoaderTest.yml';
 
-    protected $extraDataObjects = array(
-        'BulkLoaderTest_Person',
-        'BulkLoaderTest_Country'
-    );
+    protected static $extra_dataobjects = [
+        Person::class,
+        Country::class
+    ];
 
     public function testLoading()
     {
-        $loader = new ConsumerBulkLoader("BulkLoaderTest_Person");
+        $loader = new BulkLoader('AntonyThorpe\Consumer\Tests\Person');
 
         $loader->columnMap = array(
             "first name" => "FirstName",
@@ -60,7 +61,7 @@ class ConsumerBulkLoaderTest extends SapphireTest
         $this->assertEquals($results->SkippedCount(), 0);
         $this->assertEquals($results->Count(), 2);
 
-        $joe = BulkLoaderTest_Person::get()
+        $joe = Person::get()
                 ->filter("FirstName", "joe")
                 ->first();
 
@@ -74,15 +75,15 @@ class ConsumerBulkLoaderTest extends SapphireTest
     public function testLoadUpdatesOnly()
     {
         //Set up some existing dataobjects
-        BulkLoaderTest_Person::create(array("FirstName" => "joe", "Surname" => "Kiwi", "Age" => "62", "CountryID" => 1))->write();
-        BulkLoaderTest_Person::create(array("FirstName" => "bruce", "Surname" => "Aussie", "Age" => "24", "CountryID" => 2))->write();
+        Person::create(array("FirstName" => "joe", "Surname" => "Kiwi", "Age" => "62", "CountryID" => 1))->write();
+        Person::create(array("FirstName" => "bruce", "Surname" => "Aussie", "Age" => "24", "CountryID" => 2))->write();
         $this->assertEquals(
             2,
-            BulkLoaderTest_Person::get()->Count(),
-            "Two people exist in BulkLoaderTest_Person class"
+            Person::get()->Count(),
+            "Two people exist in Person class"
         );
 
-        $loader = new ConsumerBulkLoader("BulkLoaderTest_Person");
+        $loader = new BulkLoader('AntonyThorpe\Consumer\Tests\Person');
         $loader->addNewRecords = false;  // don't add new records from source
         $loader->columnMap = array(
             "firstname" => "FirstName",
@@ -114,18 +115,18 @@ class ConsumerBulkLoaderTest extends SapphireTest
         $this->assertEquals($results->SkippedCount(), 2);
         $this->assertEquals($results->Count(), 2);
 
-        $this->assertEquals(2, BulkLoaderTest_Person::get()->Count(), 'Should have two instances');
-        $this->assertNull(BulkLoaderTest_Person::get()->find('FirstName', 'NotEntered'), 'New item "NotEntered" should not be added to BulkLoaderTest_Person');
-        $this->assertNull(BulkLoaderTest_Person::get()->find('FirstName', 'NotEntered2'), 'New item "NotEntered2" should not be added to BulkLoaderTest_Person');
+        $this->assertEquals(2, Person::get()->Count(), 'Should have two instances');
+        $this->assertNull(Person::get()->find('FirstName', 'NotEntered'), 'New item "NotEntered" should not be added to Person');
+        $this->assertNull(Person::get()->find('FirstName', 'NotEntered2'), 'New item "NotEntered2" should not be added to Person');
 
-        $joe = BulkLoaderTest_Person::get()->find('FirstName', 'joe');
-        $this->assertSame(63, $joe->Age, 'Joe should have the age of 63');
-        $this->assertSame(2, $joe->CountryID, 'Joe should have the CountryID for Australia');
+        $joe = Person::get()->find('FirstName', 'joe');
+        $this->assertSame(63, (int)$joe->Age, 'Joe should have the age of 63');
+        $this->assertSame(2, (int)$joe->CountryID, 'Joe should have the CountryID for Australia');
 
-        $bruce = BulkLoaderTest_Person::get()->find('FirstName', 'bruce');
-        $this->assertSame(25, $bruce->Age, 'Bruce should have aged by one year to 25');
+        $bruce = Person::get()->find('FirstName', 'bruce');
+        $this->assertSame(25, (int)$bruce->Age, 'Bruce should have aged by one year to 25');
         $this->assertSame('Aussie', $bruce->Surname, 'Bruce should still have the surname of Aussie');
-        $this->assertSame(2, $bruce->CountryID, 'Bruce should still have the CountryID for Australia');
+        $this->assertSame(2, (int)$bruce->CountryID, 'Bruce should still have the CountryID for Australia');
     }
 
     public function testColumnMap()
@@ -135,7 +136,7 @@ class ConsumerBulkLoaderTest extends SapphireTest
 
     public function testTransformCallback()
     {
-        $loader = new ConsumerBulkLoader("BulkLoaderTest_Person");
+        $loader = new BulkLoader('AntonyThorpe\Consumer\Tests\Person');
         $data = array(
             array("FirstName" => "joe", "age" => "62", "country" => "NZ")
         );
@@ -155,7 +156,7 @@ class ConsumerBulkLoaderTest extends SapphireTest
 
     public function testRequiredFields()
     {
-        $loader = new ConsumerBulkLoader("BulkLoaderTest_Person");
+        $loader = new BulkLoader('AntonyThorpe\Consumer\Tests\Person');
         $data = array(
             array("FirstName" => "joe", "Surname" => "Bloggs"), //valid
             array("FirstName" => 0, "Surname" => "Bloggs"), //invalid firstname
@@ -174,25 +175,4 @@ class ConsumerBulkLoaderTest extends SapphireTest
         $this->assertEquals(2, $results->CreatedCount(), "Created 2");
         $this->assertEquals(4, $results->SkippedCount(), "Skipped 4");
     }
-}
-
-class BulkLoaderTest_Person extends DataObject implements TestOnly
-{
-    private static $db = array(
-        "FirstName" => "Varchar",
-        "Surname" => "Varchar",
-        "Age" => "Int"
-    );
-
-    private static $has_one = array(
-        "Country" => "BulkLoaderTest_Country"
-    );
-}
-
-class BulkLoaderTest_Country extends Dataobject implements TestOnly
-{
-    private static $db = array(
-        "Title" => "Varchar",
-        "Code" => "Varchar"
-    );
 }

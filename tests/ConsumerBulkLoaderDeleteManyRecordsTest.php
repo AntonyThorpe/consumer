@@ -2,28 +2,24 @@
 
 namespace AntonyThorpe\Consumer\Tests;
 
-use SilverStripe\Control\Email\Email;
 use SilverStripe\Dev\SapphireTest;
+use AntonyThorpe\Consumer\Tests\User;
 
-class ConsumerBulkLoaderDeleteManyRecordsTest extends SapphireTest
+class BulkLoaderDeleteManyRecordsTest extends SapphireTest
 {
-    protected static $fixture_file = array(
-        'consumer/tests/fixtures/usermock.yml'
-    );
+    protected static $fixture_file = ['fixtures/User.yml'];
 
-    protected $extraDataObjects = array(
-        'UserMock'
-    );
+    protected static $extra_dataobjects = [User::class];
 
     public function testDeleteManyRecords()
     {
-        $shanna = UserMock::get()->find(Email::class, 'Shanna@melissa.tv');
-        $nathan = UserMock::get()->find(Email::class, 'Nathan@yesenia.net');
-        $this->assertTrue($shanna->exists(), 'Shanna exists in UserMock');
-        $this->assertTrue($nathan->exists(), 'Nathan exists in UserMock');
+        $shanna = User::get()->find('Email', 'Shanna@melissa.tv');
+        $nathan = User::get()->find('Email', 'Nathan@yesenia.net');
+        $this->assertTrue($shanna->exists(), 'Shanna exists in User');
+        $this->assertTrue($nathan->exists(), 'Nathan exists in User');
 
         $apidata = json_decode($this->jsondata_to_delete, true);
-        $results = UserBulkLoaderMock::create("UserMock")->deleteManyRecords($apidata);
+        $results = UserBulkLoader::create('AntonyThorpe\Consumer\Tests\User')->deleteManyRecords($apidata);
 
         // Check Results
         $this->assertEquals($results->CreatedCount(), 0);
@@ -50,46 +46,46 @@ class ConsumerBulkLoaderDeleteManyRecordsTest extends SapphireTest
 
         // Check Dataobjects
         $this->assertNull(
-            UserMock::get()->find(Email::class, 'Shanna@melissa.tv'),
-            'Shanna@melissa.tv should not exist as a dataobject in UserMock after been deleted'
+            User::get()->find('Email', 'Shanna@melissa.tv'),
+            'Shanna@melissa.tv should not exist as a dataobject in User after been deleted'
         );
         $this->assertNull(
-            UserMock::get()->find(Email::class, 'Nathan@yesenia.net'),
-            'Nathan@yesenia.net should not exist as a dataobject in UserMock after been deleted'
+            User::get()->find('Email', 'Nathan@yesenia.net'),
+            'Nathan@yesenia.net should not exist as a dataobject in User after been deleted'
         );
 
         $this->assertTrue(
-            UserMock::get()->find(Email::class, 'Lucio_Hettinger@annie.ca')->exists(),
-            'Lucio_Hettinger@annie.ca still exists in the UserMock as we did not ask for it to be deleted'
+            User::get()->find('Email', 'Lucio_Hettinger@annie.ca')->exists(),
+            'Lucio_Hettinger@annie.ca still exists in the User as we did not ask for it to be deleted'
         );
         $this->assertNull(
-            UserMock::get()->find(Email::class, 'shouldnotchangeorbedeleted@net.net'),
+            User::get()->find('Email', 'shouldnotchangeorbedeleted@net.net'),
             'shouldnotchangeorbedeleted@net.net was never in a dataobject so should not appear'
         );
         $this->assertEquals(
             4,
-            UserMock::get()->count(),
-            "Should be two items left in UserMock"
+            User::get()->count(),
+            "Should be two items left in User"
         );
     }
 
     public function testDeleteManyWithPreview()
     {
-        $original_count = UserMock::get()->count();
+        $original_count = User::get()->count();
         $apidata = json_decode($this->jsondata_to_delete, true);
-        UserBulkLoaderMock::create('UserMock')->deleteManyRecords($apidata, true);
+        UserBulkLoader::create('AntonyThorpe\Consumer\Tests\User')->deleteManyRecords($apidata, true);
 
         $this->assertEquals(
             $original_count,
-            UserMock::get()->count(),
-            'Total instances of UserMock is unchanged'
+            User::get()->count(),
+            'Total instances of User is unchanged'
         );
 
-        $remains = UserMock::get()->find(Email::class, 'Nathan@yesenia.net');
-        $this->assertSame($remains->Email, 'Nathan@yesenia.net', 'Nathan@yesenia.net not removed from UserMock');
+        $remains = User::get()->find('Email', 'Nathan@yesenia.net');
+        $this->assertSame($remains->Email, 'Nathan@yesenia.net', 'Nathan@yesenia.net not removed from User');
 
-        $remains = UserMock::get()->find(Email::class, 'Shanna@melissa.tv');
-        $this->assertSame($remains->Email, 'Shanna@melissa.tv', 'Shanna@melissa.tv not removed from UserMock');
+        $remains = User::get()->find('Email', 'Shanna@melissa.tv');
+        $this->assertSame($remains->Email, 'Shanna@melissa.tv', 'Shanna@melissa.tv not removed from User');
     }
 
     /**

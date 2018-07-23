@@ -16,7 +16,7 @@ abstract class BulkLoaderSource implements IteratorAggregate
     /**
      * Provide iterator for bulk loading from.
      * Records are expected to be 1 dimensional key-value arrays.
-     * @return Iterator
+     * @return ArrayIterator
      */
     abstract public function getIterator();
 }

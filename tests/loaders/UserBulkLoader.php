@@ -2,19 +2,18 @@
 
 namespace AntonyThorpe\Consumer\Tests;
 
-use SilverStripe\Control\Email\Email;
 use SilverStripe\Dev\TestOnly;
-use AntonyThorpe\Consumer\ConsumerBulkLoader;
+use AntonyThorpe\Consumer\BulkLoader;
 
-class UserBulkLoaderMock extends ConsumerBulkLoader implements TestOnly
+class UserBulkLoader extends BulkLoader implements TestOnly
 {
     public $columnMap = array(
         'name' => 'Name',
-        'email' => Email::class,
+        'email' => 'Email',
         'username' => 'UserName',
         'phone' => 'Phone',
         'website' => 'Website'
     );
 
-    public $duplicateChecks = array(Email::class);
+    public $duplicateChecks = array('Email');
 }

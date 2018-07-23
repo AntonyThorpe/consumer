@@ -2,19 +2,22 @@
 
 namespace AntonyThorpe\Consumer\Tests;
 
-use SilverStripe\Control\Email\Email;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\Dev\TestOnly;
 use SilverStripe\Dev\SapphireTest;
+use AntonyThorpe\Consumer\Tests\User;
+use AntonyThorpe\Consumer\Tests\UserBulkLoader;
 
-class ConsumerBulkLoaderClearAbsentRecordsTest extends SapphireTest
+class BulkLoaderClearAbsentRecordsTest extends SapphireTest
 {
-    protected static $fixture_file = array('consumer/tests/fixtures/usermock.yml');
+    protected static $fixture_file = ['fixtures/User.yml'];
 
-    protected $extraDataObjects = array('UserMock');
+    protected static $extra_dataobjects = [User::class];
 
     public function testClearAbsentRecords()
     {
         $apidata = json_decode($this->jsondata, true);
-        $results = UserBulkLoaderMock::create("UserMock")->clearAbsentRecords($apidata, 'guid', 'Guid');
+        $results = UserBulkLoader::create('AntonyThorpe\Consumer\Tests\User')->clearAbsentRecords($apidata, 'guid', 'Guid');
 
         // Check Results
         $this->assertEquals($results->CreatedCount(), 0);
@@ -30,16 +33,16 @@ class ConsumerBulkLoaderClearAbsentRecordsTest extends SapphireTest
         );
 
         // Check Dataobjects
-        $obj = UserMock::get()->find(Email::class, 'LocalOnly@local.net');
+        $obj = User::get()->find('Email', 'LocalOnly@local.net');
         $this->assertEmpty(
             $obj->Guid,
             'LocalOnly@local.net Should have nothing in the Guid field'
         );
 
-        $obj = UserMock::get()->find(Email::class, 'Sincere@april.biz');
+        $obj = User::get()->find('Email', 'Sincere@april.biz');
         $this->assertSame(
             '1',
-            $obj->Guid,
+            (string)$obj->Guid,
             'Sincere@april.biz Should not have changed the Guid field'
         );
     }
@@ -47,16 +50,15 @@ class ConsumerBulkLoaderClearAbsentRecordsTest extends SapphireTest
     public function testClearAbsentRecordsWithPreview()
     {
         $apidata = json_decode($this->jsondata, true);
-        UserBulkLoaderMock::create("UserMock")->clearAbsentRecords($apidata, 'guid', 'Guid', true);
+        UserBulkLoader::create('AntonyThorpe\Consumer\Tests\User')->clearAbsentRecords($apidata, 'guid', 'Guid', true);
 
-        $item = UserMock::get()->find(Email::class, 'LocalOnly@local.net');
+        $item = User::get()->find('Email', 'LocalOnly@local.net');
         $this->assertSame(
             '99999',
-            $item->Guid,
+            (string)$item->Guid,
             'LocalOnly@local.net Guid property not updated'
         );
     }
-
 
     /**
      * JSON data for test

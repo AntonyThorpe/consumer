@@ -1,13 +1,10 @@
 inherit: true
 
-tools:
-  external_code_coverage: false
-  php_code_sniffer:
-    config:
-      standard: "PSR2"
-  php_cs_fixer:
-    config:
-      level: "PSR2"
+build:
+  nodes:
+    analysis:
+      tests:
+        override: [php-scrutinizer-run]
 
 checks:
   php:

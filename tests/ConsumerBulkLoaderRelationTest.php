@@ -5,15 +5,20 @@ namespace AntonyThorpe\Consumer\Tests;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\ORM\DataObject;
-use AntonyThorpe\Consumer\ConsumerBulkLoader;
+use SilverStripe\ORM\ArrayList;
+use AntonyThorpe\Consumer\BulkLoader;
+use AntonyThorpe\Consumer\ArrayBulkLoaderSource;
+use AntonyThorpe\Consumer\Tests\CourseSelection;
+use AntonyThorpe\Consumer\Tests\Course;
 
-class ConsumerBulkLoaderRelationTest extends SapphireTest
+class BulkLoaderRelationTest extends SapphireTest
 {
-    protected static $fixture_file = 'consumer/tests/fixtures/BulkLoaderRelationTest.yaml';
-    protected $extraDataObjects = array(
-        'BulkLoaderRelationTest_CourseSelection',
-        'BulkLoaderRelationTest_Course'
-    );
+    protected static $fixture_file = 'fixtures/BulkLoaderRelationTest.yml';
+
+    protected static $extra_dataobjects = [
+        Course::class,
+        CourseSelection::class
+    ];
 
     protected $loader;
 
@@ -29,7 +34,7 @@ class ConsumerBulkLoaderRelationTest extends SapphireTest
              //relation does not exist, no record
             array("Course.Title" => "Geometry 722", "Term" => 1)
         );
-        $this->loader = new ConsumerBulkLoader("BulkLoaderRelationTest_CourseSelection");
+        $this->loader = new BulkLoader('\AntonyThorpe\Consumer\Tests\CourseSelection');
         $this->loader->setSource(
             new ArrayBulkLoaderSource($data)
         );
@@ -49,12 +54,12 @@ class ConsumerBulkLoaderRelationTest extends SapphireTest
         );
         $this->assertEquals(
             4,
-            BulkLoaderRelationTest_Course::get()->count(),
+            Course::get()->count(),
             "New Geometry 722 course created"
         );
         $this->assertEquals(
             4,
-            BulkLoaderRelationTest_CourseSelection::get()->filter("CourseID:GreaterThan", 0)->count(),
+            CourseSelection::get()->filter("CourseID:GreaterThan", 0)->count(),
             "we have gone from 1 to 4 linked records"
         );
     }
@@ -73,12 +78,12 @@ class ConsumerBulkLoaderRelationTest extends SapphireTest
         );
         $this->assertEquals(
             4,
-            BulkLoaderRelationTest_Course::get()->count(),
+            Course::get()->count(),
             "New Geometry 722 course created"
         );
         $this->assertEquals(
             4,
-            BulkLoaderRelationTest_CourseSelection::get()->filter("CourseID:GreaterThan", 0)->count(),
+            CourseSelection::get()->filter("CourseID:GreaterThan", 0)->count(),
             "we have gone from 1 to 4 linked records"
         );
     }
@@ -97,12 +102,12 @@ class ConsumerBulkLoaderRelationTest extends SapphireTest
         );
         $this->assertEquals(
             3,
-            BulkLoaderRelationTest_Course::get()->count(),
+            Course::get()->count(),
             "No extra courses created"
         );
         $this->assertEquals(
             1,
-            BulkLoaderRelationTest_CourseSelection::get()->filter("CourseID:GreaterThan", 0)->count(),
+            CourseSelection::get()->filter("CourseID:GreaterThan", 0)->count(),
             "No records have been linked"
         );
     }
@@ -121,13 +126,13 @@ class ConsumerBulkLoaderRelationTest extends SapphireTest
         );
         $this->assertEquals(
             3,
-            BulkLoaderRelationTest_Course::get()->count(),
+            Course::get()->count(),
             "number of courses remains the same"
         );
         //asserting 3 and not 2 because we have no duplicate checks
         $this->assertEquals(
             3,
-            BulkLoaderRelationTest_CourseSelection::get()->filter("CourseID:GreaterThan", 0)->count(),
+            CourseSelection::get()->filter("CourseID:GreaterThan", 0)->count(),
             "we have gone from 1 to 3 linked records"
         );
     }
@@ -146,12 +151,12 @@ class ConsumerBulkLoaderRelationTest extends SapphireTest
         );
         $this->assertEquals(
             4,
-            BulkLoaderRelationTest_Course::get()->count(),
+            Course::get()->count(),
             "New Geometry 722 course created"
         );
         $this->assertEquals(
             2,
-            BulkLoaderRelationTest_CourseSelection::get()->filter("CourseID:GreaterThan", 0)->count(),
+            CourseSelection::get()->filter("CourseID:GreaterThan", 0)->count(),
             "Only the created object is linked"
         );
     }
@@ -195,24 +200,4 @@ class ConsumerBulkLoaderRelationTest extends SapphireTest
     {
         //$this->markTestIncomplete("Required relations should be checked");
     }
-}
-
-//primary object we are loading records into
-class BulkLoaderRelationTest_CourseSelection extends DataObject implements TestOnly
-{
-    private static $db = array(
-        "Term" => "Int"
-    );
-
-    private static $has_one = array(
-        "Course" => "BulkLoaderRelationTest_Course"
-    );
-}
-
-//related object
-class BulkLoaderRelationTest_Course extends DataObject implements TestOnly
-{
-    private static $db = array(
-        "Title" => "Varchar"
-    );
 }

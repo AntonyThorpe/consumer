@@ -2,17 +2,13 @@
 
 namespace AntonyThorpe\Consumer;
 
-use SilverStripe\Dev\BulkLoader_Result;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\View\ArrayData;
 
 /**
  * Store result information about a BulkLoader import
- * Overrides BulkLoader settings
- *
- * Modified from BetterBulkLoader_Results of SilverStripe-ImportExport (https://github.com/burnbright/silverstripe-importexport) 2018-07-21
  */
-class ConsumerBulkLoaderResult extends BulkLoader_Result
+class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
 {
     /**
      * Keep track of skipped records.

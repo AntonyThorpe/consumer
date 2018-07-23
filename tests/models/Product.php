@@ -4,8 +4,10 @@ namespace AntonyThorpe\Consumer\Tests;
 
 use SilverStripe\Dev\TestOnly;
 
-class ProductMock extends Page implements TestOnly
+class Product extends Page implements TestOnly
 {
+    private static $table_name = 'Product';
+
     private static $db = array(
         'InternalItemID' => 'Varchar(30)',
         'Title' => 'Varchar(200)',

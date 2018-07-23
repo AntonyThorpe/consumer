@@ -2,14 +2,11 @@
 
 namespace AntonyThorpe\Consumer;
 
-use SilverStripe\Dev\BulkLoader;
+use SilverStripe\Core\Environment;
 use SilverStripe\CMS\Model\SiteTree;
-use Exception;
 use SilverStripe\ORM\ValidationException;
 use SilverStripe\ORM\DataObject;
-use BulkLoaderSource;
-use ConsumerBulkLoaderResult;
-use ArrayBulkLoaderSource;
+use Exception;
 
 /**
  * The bulk loader allows large-scale uploads to SilverStripe via the ORM.
@@ -23,12 +20,13 @@ use ArrayBulkLoaderSource;
  *
  * Modified from BetterBulkLoader of SilverStripe-ImportExport (https://github.com/burnbright/silverstripe-importexport) 2018-07-21
  */
-class ConsumerBulkLoader extends BulkLoader
+class BulkLoader extends \SilverStripe\Dev\BulkLoader
 {
     /**
      * Fields and corresponding labels
      * that can be mapped to.
      * Can include dot notations.
+     * @var array
      */
     public $mappableFields = array();
 
@@ -87,7 +85,6 @@ class ConsumerBulkLoader extends BulkLoader
     public function setSource(BulkLoaderSource $source)
     {
         $this->source = $source;
-
         return $this;
     }
 
@@ -165,31 +162,33 @@ class ConsumerBulkLoader extends BulkLoader
      * Start loading of data
      * @param  string  $filepath
      * @param  boolean $preview  Create results but don't write
-     * @return ConsumerBulkLoaderResult
+     * @return BulkLoaderResult
      */
     public function load($filepath = null, $preview = false)
     {
+        Environment::increaseTimeLimitTo(3600);
+        Environment::increaseMemoryLimitTo('512M');
+
         $this->mappableFields_cache = $this->getMappableColumns();
         return $this->processAll($filepath, $preview);
     }
 
     /**
      * Import all records from the source
-     * Overrides BetterBulkLoader to add a call to ConsumerBulkLoaderResult
      *
      * @param  string  $filepath
      * @param  boolean $preview
-     * @return ConsumerBulkLoaderResult
+     * @return BulkLoaderResult
      */
     protected function processAll($filepath, $preview = false)
     {
         if (!$this->source) {
             user_error(
-                "No source has been configured for the bulk loader",
+                _t('Consumer.NoSourceForBulkLoader', 'No source has been configured for the bulk loader'),
                 E_USER_WARNING
             );
         }
-        $results = new ConsumerBulkLoaderResult();
+        $results = new BulkLoaderResult();
         $iterator = $this->getSource()->getIterator();
         foreach ($iterator as $record) {
             $this->processRecord($record, $this->columnMap, $results, $preview);
@@ -200,14 +199,14 @@ class ConsumerBulkLoader extends BulkLoader
 
 
     /**
-     * Import all records from the source
+     * Process a single record from source
      *
-     * @param  object $record
+     * @param object $record
      * @param array $columnMap
-     * @param  boolean $preview
-     * @param ConsumerBulkLoaderResult $results
-     * @param string $preview set to true to not write
-     * @return ConsumerBulkLoaderResult
+     * @param boolean $preview
+     * @param BulkLoaderResult $results
+     * @param string $preview set to true to prevent writing to the dataobject
+     * @return BulkLoaderResult
      */
     protected function processRecord($record, $columnMap, &$results, $preview = false)
     {
@@ -234,12 +233,13 @@ class ConsumerBulkLoader extends BulkLoader
             }
             $this->transformField($placeholder, $field, $record[$field]);
         }
-        //find existing duplicate of placeholder data
-        $existing = null;
-        if (!$placeholder->ID && !empty($this->duplicateChecks)) {
-            $data = $placeholder->getQueriedDatabaseFields();
-            $mapped_values = array_values($this->columnMap);
 
+        //Next find existing duplicate of placeholder data
+        $existing = null;
+        $data = $placeholder->getQueriedDatabaseFields();
+
+        if (!$placeholder->ID && !empty($this->duplicateChecks)) {
+            $mapped_values = array_values($this->columnMap);
             //don't match on ID, ClassName or RecordClassName
             unset($data['ID'], $data['ClassName'], $data['RecordClassName']);
 
@@ -316,7 +316,7 @@ class ConsumerBulkLoader extends BulkLoader
     }
 
     /**
-     * Convert the record's keys to appropriate columnMap keys.
+     * Convert the record's keys to the appropriate columnMap keys
      * @return array record
      */
     protected function columnMapRecord($record)
@@ -393,16 +393,12 @@ class ConsumerBulkLoader extends BulkLoader
                 if ($columnName) {
                     $relation->{$columnName} = $value;
                 }
-            }
-            //get/make relation via callback
-            elseif ($callback) {
+            } elseif ($callback) {  //get/make relation via callback
                 $relation = $callback($value, $placeholder);
                 if ($columnName) {
                     $relation->{$columnName} = $value;
                 }
-            }
-            //get/make relation via dot notation
-            elseif ($columnName) {
+            } elseif ($columnName) { //get/make relation via dot notation
                 if ($relationClass = $placeholder->getRelationClass($relationName)) {
                     $relation = $relationClass::get()
                                     ->filter($columnName, $value)
@@ -433,9 +429,7 @@ class ConsumerBulkLoader extends BulkLoader
                 //write relation object, if configured
                 if ($createnew && $relation && !$relation->isInDB()) {
                     $relation->write();
-                }
-                //write changes to existing relations
-                elseif ($relation && $relation->isInDB() && $relation->isChanged()) {
+                } elseif ($relation && $relation->isInDB() && $relation->isChanged()) {  //write changes to existing relations
                     $relation->write();
                 }
                 //add relation to relationlist, if it exists
@@ -449,9 +443,7 @@ class ConsumerBulkLoader extends BulkLoader
             if ($relationName && $relation && $relation->exists()) {
                 $placeholder->{$relationName."ID"} = $relation->ID;
             }
-        }
-        //handle data fields
-        else {
+        } else { //handle data fields
             //transform field value via callback
             //(callback can also update placeholder directly)
             if ($callback) {
@@ -475,14 +467,14 @@ class ConsumerBulkLoader extends BulkLoader
         if (strpos($field, '.') !== false) {
             list($field, $columnName) = explode('.', $field);
         }
-        $has_ones = singleton($this->objectClass)->has_one();
+        $has_ones = singleton($this->objectClass)->hasOne();
         //check if relation is present in has ones
         return isset($has_ones[$field]);
     }
 
     /**
      * Given a record field name, find out if this is a relation name
-     * and return the name.
+     * and return the name
      * @param string
      * @return string
      */
@@ -501,8 +493,7 @@ class ConsumerBulkLoader extends BulkLoader
 
     /**
      * Find an existing objects based on one or more uniqueness columns
-     * specified via {@link self::$duplicateChecks}.
-     *
+     * specified via {@link self::$duplicateChecks}
      * @param array $record data
      * @return mixed
      */
@@ -518,7 +509,7 @@ class ConsumerBulkLoader extends BulkLoader
                     list($relationName, $columnName) = explode('.', $duplicateCheck);
                     $fieldName = $relationName."ID";
                 }
-                //TODO: also convert plain relation names to include ID
+                //@todo also convert plain relation names to include ID
 
                 //skip current duplicate check if field value is empty
                 if (!isset($record[$fieldName]) || empty($record[$fieldName])) {
@@ -530,9 +521,7 @@ class ConsumerBulkLoader extends BulkLoader
                 if ($existingRecord) {
                     return $existingRecord;
                 }
-            }
-            //callback duplicate checks
-            elseif (
+            } elseif (//callback duplicate checks
                 is_array($duplicateCheck) &&
                 isset($duplicateCheck['callback']) &&
                 is_callable($duplicateCheck['callback'])
@@ -543,7 +532,7 @@ class ConsumerBulkLoader extends BulkLoader
                 }
             } else {
                 user_error(
-                    'BulkLoader::processRecord(): Wrong format for $duplicateChecks',
+                    _t('Consumer.BulkLoaderWrongFormatDuplicateChecks', 'BulkLoader::processRecord(): Wrong format for $duplicateChecks'),
                     E_USER_WARNING
                 );
             }
@@ -574,7 +563,7 @@ class ConsumerBulkLoader extends BulkLoader
 
     /**
      * Generate a field-label list of fields that data can be mapped into.
-     * @param $includerelations
+     * @param boolean $includerelations
      * @return array
      */
     public function scaffoldMappableFields($includerelations = true)
@@ -582,7 +571,7 @@ class ConsumerBulkLoader extends BulkLoader
         $map = $this->getMappableFieldsForClass($this->objectClass);
         //set up 'dot notation' (Relation.Field) style mappings
         if ($includerelations) {
-            if ($has_ones = singleton($this->objectClass)->has_one()) {
+            if ($has_ones = singleton($this->objectClass)->hasOne()) {
                 foreach ($has_ones as $relationship => $type) {
                     $fields = $this->getMappableFieldsForClass($type);
                     foreach ($fields as $field => $title) {
@@ -606,11 +595,10 @@ class ConsumerBulkLoader extends BulkLoader
         $singleton = singleton($class);
         $fields = (array)$singleton->fieldLabels(false);
         foreach ($fields as $field => $label) {
-            if (!$singleton->db($field)) {
+            if (!$singleton->hasField($field)) {
                 unset($fields[$field]);
             }
         }
-
         return $fields;
     }
 
@@ -632,19 +620,19 @@ class ConsumerBulkLoader extends BulkLoader
         // Checks
         if (!$this->objectClass) {
             user_error(
-                "No objectClass set in the subclass",
+                _t('Consumer.NoObjectClass', 'No objectClass set in the subclass'),
                 E_USER_WARNING
             );
         }
         if (!is_array($this->columnMap)) {
             user_error(
-                "No columnMap set in the subclass",
+                _t('Consumer.NoColumnMap', 'No columnMap set in the subclass'),
                 E_USER_WARNING
             );
         }
         if (!is_array($this->duplicateChecks)) {
             user_error(
-                "No duplicateChecks set in subclass",
+                _t('Consumer.NoDuplicateChecks', 'No duplicateChecks set in subclass'),
                 E_USER_WARNING
             );
         }
@@ -656,7 +644,7 @@ class ConsumerBulkLoader extends BulkLoader
      *
      * @param array $apidata An array of arrays
      * @param boolean $preview Set to true to not write
-     * @return ConsumerBulkLoaderResult
+     * @return BulkLoaderResult
      */
     public function updateRecords(array $apidata, $preview = false)
     {
@@ -672,7 +660,8 @@ class ConsumerBulkLoader extends BulkLoader
      * Update/create many dataobjects with data from the external api
      *
      * @param array $apidata
-     * @return ConsumerBulkLoaderResult
+     * @param boolean $preview Set to true to not write
+     * @return BulkLoaderResult
      */
     public function upsertManyRecords(array $apidata, $preview = false)
     {
@@ -687,7 +676,8 @@ class ConsumerBulkLoader extends BulkLoader
      * Delete dataobjects that match to the API data
      *
      * @param array $apidata
-     * @return ConsumerBulkLoaderResult
+     * @param boolean $preview Set to true to not write
+     * @return BulkLoaderResult
      */
     public function deleteManyRecords(array $apidata, $preview = false)
     {
@@ -696,8 +686,7 @@ class ConsumerBulkLoader extends BulkLoader
         }
         $this->preprocessChecks();
         $this->mappableFields_cache = $this->getMappableColumns();
-
-        $results = new ConsumerBulkLoaderResult();
+        $results = new BulkLoaderResult();
         $iterator = $this->getSource()->getIterator();
         foreach ($iterator as $record) {
             //map incoming record according to the standardisation mapping (columnMap)
@@ -735,15 +724,15 @@ class ConsumerBulkLoader extends BulkLoader
      * Clear property value if it doesn't exist as a value in the API data
      *
      * Note: only use with full set of API data otherwise values will be cleared in the dataobject that should be left
-     * @param  array   $apidata      An array of arrays
-     * @param  string  $key          The key that matches the column within the Object Class
+     * @param  array   $apidata An array of arrays
+     * @param  string  $key The key that matches the column within the Object Class
      * @param  string  $property_name The property name of the class that matches to the key from the API data
-     * @param  boolean $preview      Set to true to not save
-     * @return ConsumerBulkLoaderResult
+     * @param  boolean $preview Set to true to not save
+     * @return BulkLoaderResult
      */
     public function clearAbsentRecords(array $apidata, $key, $property_name, $preview = false)
     {
-        $results = new ConsumerBulkLoaderResult();
+        $results = new BulkLoaderResult();
         $modelClass = $this->objectClass;
 
         foreach ($modelClass::get() as $record) {

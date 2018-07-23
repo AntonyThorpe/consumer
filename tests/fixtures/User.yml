@@ -1,4 +1,4 @@
-AntonyThorpe\Consumer\Tests\UserMock:
+AntonyThorpe\Consumer\Tests\User:
   um1:
     Name: Will Be Updated
     UserName: Will Be Updated

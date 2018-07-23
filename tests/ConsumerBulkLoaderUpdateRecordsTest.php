@@ -2,36 +2,38 @@
 
 namespace AntonyThorpe\Consumer\Tests;
 
-use SilverStripe\Control\Email\Email;
+use SilverStripe\Core\Convert;
 use SilverStripe\Dev\SapphireTest;
+use AntonyThorpe\Consumer\Tests\User;
+use AntonyThorpe\Consumer\Tests\Product;
 
-class ConsumerBulkLoaderUpdateRecordsTest extends SapphireTest
+class BulkLoaderUpdateRecordsTest extends SapphireTest
 {
     protected static $fixture_file = array(
-        'consumer/tests/fixtures/usermock.yml',
-        'consumer/tests/fixtures/productmock.yml'
+        'fixtures/User.yml',
+        'fixtures/Product.yml'
     );
 
-    protected $extraDataObjects = array(
-        'UserMock',
-        'ProductMock'
-    );
+    protected static $extra_dataobjects = [
+        User::class,
+        Product::class
+    ];
 
     public function setUp()
     {
         parent::setUp();
 
         //publish some product categories and products so as to test the Live version
-        $this->objFromFixture('ProductMock', 'products')->publish('Stage', 'Live');
-        $this->objFromFixture('ProductMock', 'pm1')->publish('Stage', 'Live');
-        $this->objFromFixture('ProductMock', 'pm2')->publish('Stage', 'Live');
-        $this->objFromFixture('ProductMock', 'pm3')->publish('Stage', 'Live');
+        $this->objFromFixture(Product::class, 'products')->publish('Stage', 'Live');
+        $this->objFromFixture(Product::class, 'pm1')->publish('Stage', 'Live');
+        $this->objFromFixture(Product::class, 'pm2')->publish('Stage', 'Live');
+        $this->objFromFixture(Product::class, 'pm3')->publish('Stage', 'Live');
     }
 
     public function testUpdateRecords()
     {
         $apidata = json_decode($this->jsondata1, true);
-        $results = UserBulkLoaderMock::create("UserMock")->updateRecords($apidata);
+        $results = UserBulkLoader::create('AntonyThorpe\Consumer\Tests\User')->updateRecords($apidata);
 
         // Check Results
         $this->assertEquals($results->CreatedCount(), 0);
@@ -52,7 +54,7 @@ class ConsumerBulkLoaderUpdateRecordsTest extends SapphireTest
         );
 
         // Check Dataobjects
-        $obj = UserMock::get()->find(Email::class, 'Sincere@april.biz');
+        $obj = User::get()->find('Email', 'Sincere@april.biz');
         $this->assertSame(
             'Leanne Graham',
             $obj->Name,
@@ -69,37 +71,37 @@ class ConsumerBulkLoaderUpdateRecordsTest extends SapphireTest
             'Should have changed the Phone number of Sincere@april.biz to 1-770-736-8031 x56442'
         );
 
-        $obj_untouched = UserMock::get()->find(Email::class, 'LocalOnly@local.net');
+        $obj_untouched = User::get()->find('Email', 'LocalOnly@local.net');
         $this->assertEquals(
             1,
             count($obj_untouched),
-            "Existing unsynched dataobject should remain in UserMock"
+            "Existing unsynched dataobject should remain in User"
         );
         $this->assertSame(
             'LocalOnly',
             $obj_untouched->UserName,
-            'Calling the Consumer functions does not alter an existing unsynched dataobject in UserMock'
+            'Calling the Consumer functions does not alter an existing unsynched dataobject in User'
         );
 
         $this->assertNull(
-            UserMock::get()->find(Email::class, 'Rey.Padberg@karina.biz'),
+            User::get()->find('Email', 'Rey.Padberg@karina.biz'),
             'Rey.Padberg@karina.biz has not been accidently created'
         );
     }
 
     public function testUpdateRecordsWithPreview()
     {
-        $original_count = UserMock::get()->count();
+        $original_count = User::get()->count();
         $apidata = json_decode($this->jsondata1, true);
-        UserBulkLoaderMock::create("UserMock")->updateRecords($apidata, true);
+        UserBulkLoader::create('AntonyThorpe\Consumer\Tests\User')->updateRecords($apidata, true);
 
         $this->assertEquals(
             $original_count,
-            UserMock::get()->count(),
-            'Total instances of UserMock is unchanged'
+            User::get()->count(),
+            'Total instances of User is unchanged'
         );
 
-        $remains = UserMock::get()->find(Email::class, 'Sincere@april.biz');
+        $remains = User::get()->find('Email', 'Sincere@april.biz');
         $this->assertSame(
             'Will Be Updated',
             $remains->Name,
@@ -111,7 +113,7 @@ class ConsumerBulkLoaderUpdateRecordsTest extends SapphireTest
             'Sincere@april.biz Phone not updated'
         );
 
-        $remains = UserMock::get()->find(Email::class, 'Shanna@melissa.tv');
+        $remains = User::get()->find('Email', 'Shanna@melissa.tv');
         $this->assertSame(
             'Will Be Updated',
             $remains->Name,
@@ -127,7 +129,7 @@ class ConsumerBulkLoaderUpdateRecordsTest extends SapphireTest
     public function testUpdateRecordsWhenDataobjectExtendsPage()
     {
         $apidata = json_decode($this->jsondata2, true);
-        $loader = ProductBulkLoaderMock::create("ProductMock");
+        $loader = ProductBulkLoader::create('AntonyThorpe\Consumer\Tests\Product');
         $loader->transforms = array(
             'Title' => array(
                 'callback' => function ($value, &$placeholder) {
@@ -158,15 +160,15 @@ class ConsumerBulkLoaderUpdateRecordsTest extends SapphireTest
         $this->assertNotContains(
             'ShowInMenus',
             print_r($results->getUpdated(), true),
-            'Does not contain ShowInMenus (a default of the Page class) - these are left as is and not altered by ProductBulkLoaderMock'
+            'Does not contain ShowInMenus (a default of the Page class) - these are left as is and not altered by ProductBulkLoader'
         );
         $this->assertNotContains(
             'ShowInSearch',
             print_r($results->getUpdated(), true),
-            'Does not contain ShowInMenus (a default of the Page class) - these are left as is and not altered by ProductBulkLoaderMock'
+            'Does not contain ShowInMenus (a default of the Page class) - these are left as is and not altered by ProductBulkLoader'
         );
 
-        $book = ProductMock::get()->find('InternalItemID', 'BOOK');
+        $book = Product::get()->find('InternalItemID', 'BOOK');
         $this->assertSame(
             'Book of Science',
             $book->Title,
@@ -178,7 +180,7 @@ class ConsumerBulkLoaderUpdateRecordsTest extends SapphireTest
             'The URLSegment has been changed to book-of-science'
         );
 
-        $space = ProductMock::get()->find('InternalItemID', 'SPACE');
+        $space = Product::get()->find('InternalItemID', 'SPACE');
         $this->assertSame(
             '95.95',
             $space->BasePrice,
@@ -188,7 +190,7 @@ class ConsumerBulkLoaderUpdateRecordsTest extends SapphireTest
         $this->assertSame(
             0,
             (int)$space->ShowInMenus,
-            'ProductBulkLoaderMock does not set to true ShowInMenus and ShowInSearch'
+            'ProductBulkLoader does not set to true ShowInMenus and ShowInSearch'
         );
     }
 

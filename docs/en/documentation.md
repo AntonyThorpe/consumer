@@ -3,6 +3,8 @@
 ## Starting Point Example
 A dataobject class in an eCommerce website:
 ```php
+namespace 'Your\Namespace';
+
 class Product extends Page
 {
     private static $db = array(
@@ -13,10 +15,12 @@ class Product extends Page
 }
 ```
 
-## Subclass the ConsumerBulkLoader class
+## Subclass the BulkLoader class
 Set your column map between the external API fields and the dataobject (see tests for advanced settings, like Relations/callbacks for each API data row).
 ```php
-class ProductBulkLoader extends ConsumerBulkLoader
+use AntonyThorpe\Consumer\BulkLoader;
+
+class ProductBulkLoader extends BulkLoader
 {
     public $columnMap = array(
         'ProductCode' => 'InternalItemID',
@@ -31,6 +35,11 @@ class ProductBulkLoader extends ConsumerBulkLoader
 ## Create a BuildTask to alter the dataobject
 Create a [BuildTask](http://www.balbuss.com/creating-tasks/) to call an external API and update the dataobject.
 ```php
+use SilverStripe\Dev\BuildTask;
+use SilverStripe\Core\Convert;
+use Your\Namespace\ProductBulkLoader;
+use Your\Namspace\ProductCategory;
+
 class ProductBuildTaskExample extends BuildTask
 {
     public function run($request)
@@ -38,7 +47,7 @@ class ProductBuildTaskExample extends BuildTask
         // $response = call to external API to get products;
         // below code assumes the use of Guzzle(http://docs.guzzlephp.org/en/latest/)
         if ($response->getStatusCode() == '200' && $apidata = json_decode($response->getBody()->getContents(), true)) {
-            $loader = ProductBulkLoader::create('Product');
+            $loader = ProductBulkLoader::create('Your\Namspace\Product');  // must be single quotes
             $loader->transforms = array(
                 'Parent' => array(
                     'callback' => function ($value, $placeholder) {
@@ -70,7 +79,7 @@ class ProductBuildTaskExample extends BuildTask
 ```
 
 ## Dry Run and Review Results
-To preview the Bulk Loader Results without altering the dataobject, add `true` as the second argument in the ConsumerBulkLoader method.  Example below:
+To preview the Bulk Loader Results without altering the dataobject, add `true` as the second argument in the BulkLoader method.  Example below:
 ```php
     $results = ProductBulkLoader::create('User')->updateRecords($apidata, true);
 
@@ -89,7 +98,7 @@ To preview the Bulk Loader Results without altering the dataobject, add `true` a
     }
 ```
 
-## ConsumerBulkLoader Methods
+## BulkLoader Methods
 * `updateRecords` - update a record if it exists
 * `upsertManyRecords` - update an existing record or create a new one
 * `deleteManyRecords` - delete the dataobjects matched to the supplied data
@@ -99,6 +108,8 @@ To preview the Bulk Loader Results without altering the dataobject, add `true` a
 Having the maximum edited date provides an option to limit the next API call (`url/endpoint?modifiedSince=Date`).
 The example below saves the maximum `lastmodified` field(provided by the external API):
 ```php
+use AntonyThorpe\Consumer\Consumer;
+
 $jsondata = '[
     {
         "id": 2,

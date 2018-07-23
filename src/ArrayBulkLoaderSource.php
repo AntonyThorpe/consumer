@@ -6,7 +6,7 @@ use ArrayIterator;
 
 /**
  * Array Bulk Loader Source
- * Useful for testing bulk loader. The output is the same as input.
+ * Useful for testing bulk loader. The output is the same as the input.
  */
 class ArrayBulkLoaderSource extends BulkLoaderSource
 {

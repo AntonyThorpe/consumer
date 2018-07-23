@@ -3,14 +3,8 @@
 	"description": "A SilverStripe BulkLoader for consuming external APIs",
 	"type": "silverstripe-module",
 	"keywords": ["Silverstripe", "BulkLoader", "JSON", "XML"],
-	"extra": {
-		"installer-name": "consumer",
-		"branch-alias": {
-			"dev-master": "2.*-dev"
-		}
-	},
 	"require": {
-		"silverstripe/recipe-cms": "^4.1"
+		"silverstripe/framework": "^4.0.0"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^5.7"
@@ -21,5 +15,11 @@
             "AntonyThorpe\\Consumer\\Tests\\": "tests/"
         }
     },
+    "extra": {
+        "installer-name": "consumer",
+		"branch-alias": {
+			"dev-master": "2.*-dev"
+		}
+	},
 	"license": "MIT"
 }
