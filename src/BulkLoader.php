@@ -38,7 +38,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Specify a colsure to be run on every imported record.
-     * @var Closure
+     * @var function
      */
     public $recordCallback;
 
@@ -90,7 +90,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Get the BulkLoaderSource for this BulkLoader
-     * @return BulkLoaderSource $source
+     * @return \AntonyThorpe\Consumer\BulkLoaderSource $source
      */
     public function getSource()
     {
@@ -100,7 +100,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
     /**
      * Set the default behaviour for linking existing relation objects.
      * @param boolean $default
-     * @return BulkLoader
+     * @return \AntonyThorpe\Consumer\BulkLoader
      */
     public function setRelationLinkDefault($default)
     {
@@ -111,7 +111,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
     /**
      * Set the default behaviour for creating new relation objects.
      * @param boolean $default
-     * @return BulkLoader
+     * @return \AntonyThorpe\Consumer\BulkLoader
      */
     public function setRelationCreateDefault($default)
     {
@@ -119,6 +119,11 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
         return $this;
     }
 
+    /**
+     * Set pages to published upon upload
+     * @param boolean $default
+     * @return \AntonyThorpe\Consumer\BulkLoader
+     */
     public function setPublishPages($dopubilsh)
     {
         $this->publishPages = $dopubilsh;
@@ -135,7 +140,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Get the DataList of objects this loader applies to.
-     * @return DataList
+     * @return \SilverStripe\ORM\DataList
      */
     public function getDataList()
     {
@@ -147,7 +152,6 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
      * Preview a file import (don't write anything to the database).
      * Useful to analyze the input and give the users a chance to influence
      * it through a UI.
-     *
      * @param string $filepath Absolute path to the file we're importing
      * @return array See {@link self::processAll()}
      */
@@ -162,7 +166,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
      * Start loading of data
      * @param  string  $filepath
      * @param  boolean $preview  Create results but don't write
-     * @return BulkLoaderResult
+     * @return \AntonyThorpe\Consumer\BulkLoaderResult
      */
     public function load($filepath = null, $preview = false)
     {
@@ -175,10 +179,9 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Import all records from the source
-     *
      * @param  string  $filepath
      * @param  boolean $preview
-     * @return BulkLoaderResult
+     * @return \AntonyThorpe\Consumer\BulkLoaderResult
      */
     protected function processAll($filepath, $preview = false)
     {
@@ -200,13 +203,12 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Process a single record from source
-     *
      * @param object $record
      * @param array $columnMap
      * @param boolean $preview
      * @param BulkLoaderResult $results
      * @param string $preview set to true to prevent writing to the dataobject
-     * @return BulkLoaderResult
+     * @return \AntonyThorpe\Consumer\BulkLoaderResult
      */
     protected function processRecord($record, $columnMap, &$results, $preview = false)
     {
@@ -309,7 +311,6 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
         $objID = $obj->ID;
         // reduce memory usage
         $obj->destroy();
-        unset($existingObj);
         unset($obj);
 
         return $objID;
@@ -360,7 +361,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Perform field transformation or setting of data on placeholder.
-     * @param  DataObject $placeholder
+     * @param  \SilverStripe\ORM\DataObject $placeholder
      * @param  string $field
      * @param  mixed $value
      */
@@ -644,7 +645,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
      *
      * @param array $apidata An array of arrays
      * @param boolean $preview Set to true to not write
-     * @return BulkLoaderResult
+     * @return \AntonyThorpe\Consumer\BulkLoaderResult
      */
     public function updateRecords(array $apidata, $preview = false)
     {
@@ -677,7 +678,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
      *
      * @param array $apidata
      * @param boolean $preview Set to true to not write
-     * @return BulkLoaderResult
+     * @return \AntonyThorpe\Consumer\BulkLoaderResult
      */
     public function deleteManyRecords(array $apidata, $preview = false)
     {
@@ -722,13 +723,12 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Clear property value if it doesn't exist as a value in the API data
-     *
      * Note: only use with full set of API data otherwise values will be cleared in the dataobject that should be left
      * @param  array   $apidata An array of arrays
      * @param  string  $key The key that matches the column within the Object Class
      * @param  string  $property_name The property name of the class that matches to the key from the API data
      * @param  boolean $preview Set to true to not save
-     * @return BulkLoaderResult
+     * @return \AntonyThorpe\Consumer\BulkLoaderResult
      */
     public function clearAbsentRecords(array $apidata, $key, $property_name, $preview = false)
     {
@@ -741,7 +741,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
             if (!empty($property_value)) {
                 $match = array_filter(
                     $apidata,
-                    function ($value) use ($record, $key, $property_value) {
+                    function ($value) use ($key, $property_value) {
                         return $value[$key] == $property_value;
                     }
                 );

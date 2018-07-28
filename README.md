@@ -22,7 +22,7 @@ Where there is an external source of truth that a dataobject needs to be updated
 An [example](https://github.com/AntonyThorpe/silvershop-unleashed) is an eCommerce website where the product prices need to be kept in alignment with an online inventory system (which is used post-sale to manage fulfilment of an order).  With the eCommerce site being a subset of the total inventory items in stock, updating, without creating new product items, is required.  The pricing and other properties change frequently.  Based upon the philosophy of *entering data only once* a sync from the external source of truth would keep the website accurate, up to date and reduce end user maintenance.
 
 ## How to use
-* Subclass `\AntonyThorpe\Consumer\BulkLoader` and set your column map between the dataobject and external API fields (see docs and tests folder for guidance).  
+* Subclass `\AntonyThorpe\Consumer\BulkLoader` and set your column map between the external API fields and the dataobject (see docs and tests folder for guidance).
 * Create a `BuildTask` to retrieve fresh API data using a tool like [Guzzle](http://docs.guzzlephp.org/en/latest/)
 * Alter the dataobject via a method on your BulkLoader subclass
 * Review the Bulk Loader Results report

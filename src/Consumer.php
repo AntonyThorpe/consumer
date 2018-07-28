@@ -7,18 +7,18 @@ use DateTime;
 use Exception;
 
 /**
- * Consumer
- *
- * Record the LastEdited provided from external data
+ * Record the LastEdited date provided from external data
  */
 class Consumer extends DataObject
 {
     private static $table_name = 'Consumer';
 
     /**
-     * ExternalLastEdited is the last modified date from the external API data.
      * Save the maximum data using setExternalLastEdited method.  Can use it to filter future calls to the API.
      * @var array
+     * @property Title provides a name against the API call
+     * @property ExternalLastEditedKey is the key that labels the last date the call was made
+     * @property ExternalLastEdited is the last modified date from the external API data
      */
     private static $db = [
         'Title' => 'Varchar(250)',
@@ -42,9 +42,8 @@ class Consumer extends DataObject
 
     /**
      * Determine if the string is a Unix Timestamp
-     *
      * @link(Stack Overflow, http://stackoverflow.com/questions/2524680/check-whether-the-string-is-a-unix-timestamp)
-     * @param  string  $string
+     * @param  string $string
      * @return boolean
      */
     public static function isTimestamp($string)
@@ -63,7 +62,6 @@ class Consumer extends DataObject
 
     /**
      * Set the ExternalLastEdited to the maximum last edited date
-     *
      * @param array $apidata
      * @return $this
      */

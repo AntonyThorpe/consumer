@@ -80,7 +80,6 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
 
     /**
      * Genenrate a human-readable result message.
-     *
      * @return string
      */
     public function getMessage()
@@ -108,8 +107,7 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
     /**
      * Returns all created objects. Each object might
      * contain specific importer feedback in the "_BulkLoaderMessage" property.
-     *
-     * @return ArrayList
+     * @return \SilverStripe\ORM\ArrayList
      */
     public function getCreated()
     {
@@ -119,7 +117,7 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
     /**
      * Return all updated objects
      *
-     * @return ArrayList
+     * @return \SilverStripe\ORM\ArrayList
      */
     public function getUpdated()
     {
@@ -132,8 +130,7 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
 
     /**
      * Return all deleted objects
-     *
-     * @return ArrayList
+     * @return \SilverStripe\ORM\ArrayList
      */
     public function getDeleted()
     {
@@ -146,8 +143,7 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
 
     /**
      * Prepare the boby for an email or build task
-     *
-     * @return array
+     * @return \SilverStripe\ORM\ArrayList
      */
     public function getData()
     {
@@ -168,8 +164,8 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
     }
 
     /**
-     * @param $obj DataObject
-     * @param $message string
+     * @param \SilverStripe\ORM\DataObject $obj
+     * @param string $message
      */
     public function addCreated($obj, $message = null)
     {
@@ -178,8 +174,8 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
     }
 
     /**
-     * @param $obj DataObject
-     * @param $message string
+     * @param \SilverStripe\ORM\DataObject $obj
+     * @param string $message
      */
     public function addUpdated($obj, $message = null, $additionalFields = null)
     {
@@ -207,7 +203,7 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
 
     /**
      * Modelled on the getChangedFields of DataObject, with the addition of the variable's type
-     * @param  Dataobject $obj
+     * @param \SilverStripe\ORM\DataObject $obj
      * @return array The before/after changes of each field
      */
     protected function getChangedFields($obj)
@@ -222,8 +218,8 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
     }
 
     /**
-     * @param $obj DataObject
-     * @param $message string
+     * @param \SilverStripe\ORM\DataObject $obj
+     * @param string $message
      */
     public function addDeleted($obj, $message = null)
     {
@@ -233,8 +229,8 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
 
     /**
      * Create the Result for Deleted and Created items
-     * @param  Dataobject $obj
-     * @param  string $message
+     * @param  \SilverStripe\ORM\DataObject $obj
+     * @param  String $message
      * @return array
      */
     protected function createResult($obj, $message)
@@ -246,7 +242,7 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
 
     /**
      * @param $arr array Either the created, updated or deleted items
-     * @return ArrayList
+     * @return \SilverStripe\ORM\ArrayList
      */
     protected function mapToArrayList($arr)
     {

@@ -6,7 +6,6 @@ class Utilities
 {
     /**
      * get duplicates in an array
-     *
      * @param  array  $data a list
      * @return array  The items that are duplicates
      */
