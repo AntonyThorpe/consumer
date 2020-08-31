@@ -1,7 +1,7 @@
 {
 	"name": "antonythorpe/consumer",
 	"description": "A SilverStripe BulkLoader for consuming external APIs",
-	"type": "silverstripe-module",
+	"type": "silverstripe-vendormodule",
 	"keywords": ["Silverstripe", "BulkLoader", "JSON", "XML"],
 	"require": {
 		"silverstripe/framework": "^4.0.0"
@@ -16,7 +16,6 @@
         }
     },
     "extra": {
-        "installer-name": "consumer",
 		"branch-alias": {
 			"dev-master": "2.*-dev"
 		}
