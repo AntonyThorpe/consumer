@@ -182,7 +182,7 @@ class BulkLoaderUpdateRecordsTest extends SapphireTest
 
         $space = Product::get()->find('InternalItemID', 'SPACE');
         $this->assertSame(
-            '95.95',
+            95.95,
             $space->BasePrice,
             'DefaultSellPrice has been set to 95.95'
         );
