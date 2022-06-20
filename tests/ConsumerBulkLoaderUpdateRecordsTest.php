@@ -72,11 +72,6 @@ class BulkLoaderUpdateRecordsTest extends SapphireTest
         );
 
         $obj_untouched = User::get()->find('Email', 'LocalOnly@local.net');
-        $this->assertEquals(
-            1,
-            count($obj_untouched),
-            "Existing unsynched dataobject should remain in User"
-        );
         $this->assertSame(
             'LocalOnly',
             $obj_untouched->UserName,
@@ -182,7 +177,7 @@ class BulkLoaderUpdateRecordsTest extends SapphireTest
 
         $space = Product::get()->find('InternalItemID', 'SPACE');
         $this->assertSame(
-            95.95,
+            '95.95',
             $space->BasePrice,
             'DefaultSellPrice has been set to 95.95'
         );
