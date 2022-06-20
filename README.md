@@ -1,7 +1,7 @@
 # consumer
 A SilverStripe BulkLoader for consuming external APIs
 
-[![Build Status](https://travis-ci.org/AntonyThorpe/consumer.svg?branch=master)](https://travis-ci.org/AntonyThorpe/consumer)
+[![CI](https://github.com/AntonyThorpe/consumer/actions/workflows/ci.yml/badge.svg)](https://github.com/AntonyThorpe/consumer/actions/workflows/ci.yml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/antonythorpe/consumer/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/antonythorpe/consumer/?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/antonythorpe/consumer/v/stable)](https://packagist.org/packages/antonythorpe/consumer)
 [![Total Downloads](https://poser.pugx.org/antonythorpe/consumer/downloads)](https://packagist.org/packages/antonythorpe/consumer)
