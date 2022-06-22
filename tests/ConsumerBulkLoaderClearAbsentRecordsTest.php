@@ -26,7 +26,7 @@ class BulkLoaderClearAbsentRecordsTest extends SapphireTest
         $this->assertEquals($results->SkippedCount(), 0);
         $this->assertEquals($results->Count(), 1);
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             '[before] => (string) 99999',
             print_r($results->getUpdated(), true),
             'Results show that LocalOnly@local.net will have its Guid property was 99999'

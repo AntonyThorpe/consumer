@@ -23,7 +23,7 @@ class BulkLoaderRelationTest extends SapphireTest
     protected $loader;
 
     //use the same source for all tests
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $data = array(

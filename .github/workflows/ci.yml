@@ -11,6 +11,5 @@ jobs:
   ci:
     uses: silverstripe/gha-ci/.github/workflows/ci.yml@v1
     with:
-      simple_matrix: true
       composer_require_extra:
-        phpunit/phpunit:^5.7.27
+        phpunit/phpunit:^9.5

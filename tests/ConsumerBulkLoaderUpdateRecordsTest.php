@@ -19,7 +19,7 @@ class BulkLoaderUpdateRecordsTest extends SapphireTest
         Product::class
     ];
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -42,12 +42,12 @@ class BulkLoaderUpdateRecordsTest extends SapphireTest
         $this->assertEquals($results->SkippedCount(), 7);
         $this->assertEquals($results->Count(), 3);
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             '[before] => (string) Will Be Updated',
             print_r($results->getUpdated(), true),
             'Results show Sincere@april.biz will be updated'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             '[after] => (string) Leanne Graham',
             print_r($results->getUpdated(), true),
             'Results show Sincere@april.biz has been changed'
@@ -142,22 +142,22 @@ class BulkLoaderUpdateRecordsTest extends SapphireTest
         $this->assertEquals($results->SkippedCount(), 0);
         $this->assertEquals($results->Count(), 2);
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             '[before] => (string) Space - Beyond the Solar System',
             print_r($results->getUpdated(), true),
             'Results show product code SPACE will be updated'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             '[after] => (string) Space - The Final Frontier',
             print_r($results->getUpdated(), true),
             'Results show product code SPACE has been changed'
         );
-        $this->assertNotContains(
+        $this->assertStringNotContainsString(
             'ShowInMenus',
             print_r($results->getUpdated(), true),
             'Does not contain ShowInMenus (a default of the Page class) - these are left as is and not altered by ProductBulkLoader'
         );
-        $this->assertNotContains(
+        $this->assertStringNotContainsString(
             'ShowInSearch',
             print_r($results->getUpdated(), true),
             'Does not contain ShowInMenus (a default of the Page class) - these are left as is and not altered by ProductBulkLoader'

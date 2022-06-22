@@ -23,17 +23,17 @@ class BulkLoaderUpsertManyRecordsTest extends SapphireTest
         $this->assertEquals($results->SkippedCount(), 0);
         $this->assertEquals($results->Count(), 3);
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             '[Email] => brandnewguy@net.net',
             print_r($results->getCreated(), true),
             'Results show brandnewguy@net.net has been created'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             '[before] => (string) Will Be Updated',
             print_r($results->getUpdated(), true),
             'Results show ID 2 will be updated'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             '[after] => (string) anastasia.net',
             print_r($results->getUpdated(), true),
             'Results show ID 2 has been changed'

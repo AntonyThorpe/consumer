@@ -28,17 +28,17 @@ class BulkLoaderDeleteManyRecordsTest extends SapphireTest
         $this->assertEquals($results->SkippedCount(), 1);
         $this->assertEquals($results->Count(), 0);
 
-        $this->assertContains(
+        $this->assertStringContainsString(
             '[Email] => Shanna@melissa.tv',
             print_r($results->getDeleted(), true),
             'Results show Sincere@april.biz will be updated'
         );
-        $this->assertContains(
+        $this->assertStringContainsString(
             '[Email] => Nathan@yesenia.net',
             print_r($results->getDeleted(), true),
             'Results show Sincere@april.biz has been changed'
         );
-        $this->assertNotContains(
+        $this->assertStringNotContainsString(
             'shouldnotchangeanything@net.net',
             print_r($results, true),
             'shouldnotchangeanything@net.net was never in a dataobject so should not be deleted in the log'
