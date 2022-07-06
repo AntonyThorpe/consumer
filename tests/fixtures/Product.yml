@@ -17,7 +17,7 @@ AntonyThorpe\Consumer\Tests\Product:
   pm2:
     InternalItemID: BOOK
     Title: Book of Bad Smells
-    BasePrice: 123456789
+    BasePrice: 12345.89
     URLSegment: book
     Content: <p>This is some content</p>
     Parent: =>AntonyThorpe\Consumer\Tests\Product.products
@@ -26,7 +26,7 @@ AntonyThorpe\Consumer\Tests\Product:
   pm3:
     InternalItemID: CFIRE
     Title: Chariot of Fire will need to be updated along with the default selling price
-    BasePrice: 1000000
+    BasePrice: 100.00
     URLSegment: chariot
     Content: <p>This is some content</p>
     Parent: =>AntonyThorpe\Consumer\Tests\Product.products
