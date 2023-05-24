@@ -270,7 +270,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
         }
 
         //callback access to every object
-        if (method_exists($this, $this->recordCallback)) {
+        if ($this->recordCallback && method_exists($this, $this->recordCallback)) {
             $callback  = $this->recordCallback;
             $this->{$callback}($obj, $record);
         }

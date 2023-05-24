@@ -3,6 +3,7 @@
 namespace AntonyThorpe\Consumer;
 
 use IteratorAggregate;
+use ArrayIterator;
 
 /**
  * An abstract source to bulk load records from.
@@ -16,7 +17,7 @@ abstract class BulkLoaderSource implements IteratorAggregate
     /**
      * Provide iterator for bulk loading from.
      * Records are expected to be 1 dimensional key-value arrays.
-     * @return \ArrayIterator
+     * @return ArrayIterator
      */
-    abstract public function getIterator();
+    abstract public function getIterator(): ArrayIterator;
 }

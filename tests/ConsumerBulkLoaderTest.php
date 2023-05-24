@@ -129,11 +129,6 @@ class BulkLoaderTest extends SapphireTest
         $this->assertSame(2, (int)$bruce->CountryID, 'Bruce should still have the CountryID for Australia');
     }
 
-    public function testColumnMap()
-    {
-        //$this->markTestIncomplete("Implement this");
-    }
-
     public function testTransformCallback()
     {
         $loader = new BulkLoader('AntonyThorpe\Consumer\Tests\Person');

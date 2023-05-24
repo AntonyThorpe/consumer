@@ -195,9 +195,4 @@ class BulkLoaderRelationTest extends SapphireTest
         $this->assertEquals(3, $results->CreatedCount(), "3 more records created");
         $this->assertEquals(3, $list->count(), "relation list count remains the same");
     }
-
-    public function testRequiredRelation()
-    {
-        //$this->markTestIncomplete("Required relations should be checked");
-    }
 }

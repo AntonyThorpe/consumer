@@ -32,9 +32,9 @@ class Consumer extends DataObject
         $date = new DateTime();
 
         if (strlen($string) > 10) {
-            $date->setTimestamp($string/1000);  // Unix date with milliseconds
+            $date->setTimestamp(intval($string/1000));  // Unix date with milliseconds
         } else {
-            $date->setTimestamp($string);
+            $date->setTimestamp(intval($string));
         }
 
         return $date->format('Y-m-d\TH:i:s.u');

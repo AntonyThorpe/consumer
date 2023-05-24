@@ -1,5 +1,8 @@
 # Upgrading
 
+## 3.0.0
+No breaking changes
+
 ## 2.0.0
 ### Namespace
 Add `use AntonyThorpe\Consumer\...` after your namespace declaration

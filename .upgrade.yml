@@ -1,7 +1,0 @@
-mappings:
-  Consumer: AntonyThorpe\Consumer\Consumer
-  BulkLoader: AntonyThorpe\Consumer\BulkLoader
-  BulkLoaderSource: AntonyThorpe\Consumer\BulkLoaderSource
-  Utilities: AntonyThorpe\Consumer\Utilities
-  BulkLoaderResult: AntonyThorpe\Consumer\BulkLoaderResult
-  ArrayBulkLoaderSource: AntonyThorpe\Consumer\ArrayBulkLoaderSource

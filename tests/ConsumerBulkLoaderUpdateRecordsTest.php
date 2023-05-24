@@ -24,10 +24,10 @@ class BulkLoaderUpdateRecordsTest extends SapphireTest
         parent::setUp();
 
         //publish some product categories and products so as to test the Live version
-        $this->objFromFixture(Product::class, 'products')->publish('Stage', 'Live');
-        $this->objFromFixture(Product::class, 'pm1')->publish('Stage', 'Live');
-        $this->objFromFixture(Product::class, 'pm2')->publish('Stage', 'Live');
-        $this->objFromFixture(Product::class, 'pm3')->publish('Stage', 'Live');
+        $this->objFromFixture(Product::class, 'products')->copyVersionToStage('Stage', 'Live');
+        $this->objFromFixture(Product::class, 'pm1')->copyVersionToStage('Stage', 'Live');
+        $this->objFromFixture(Product::class, 'pm2')->copyVersionToStage('Stage', 'Live');
+        $this->objFromFixture(Product::class, 'pm3')->copyVersionToStage('Stage', 'Live');
     }
 
     public function testUpdateRecords()
@@ -139,7 +139,7 @@ class BulkLoaderUpdateRecordsTest extends SapphireTest
         $this->assertEquals($results->CreatedCount(), 0);
         $this->assertEquals($results->UpdatedCount(), 2);
         $this->assertEquals($results->DeletedCount(), 0);
-        $this->assertEquals($results->SkippedCount(), 0);
+        $this->assertEquals($results->SkippedCount(), 2);
         $this->assertEquals($results->Count(), 2);
 
         $this->assertStringContainsString(

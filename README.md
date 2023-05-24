@@ -2,7 +2,6 @@
 A SilverStripe BulkLoader for consuming external APIs
 
 [![CI](https://github.com/AntonyThorpe/consumer/actions/workflows/ci.yml/badge.svg)](https://github.com/AntonyThorpe/consumer/actions/workflows/ci.yml)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/antonythorpe/consumer/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/antonythorpe/consumer/?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/antonythorpe/consumer/v/stable)](https://packagist.org/packages/antonythorpe/consumer)
 [![Total Downloads](https://poser.pugx.org/antonythorpe/consumer/downloads)](https://packagist.org/packages/antonythorpe/consumer)
 [![Latest Unstable Version](https://poser.pugx.org/antonythorpe/consumer/v/unstable)](https://packagist.org/packages/antonythorpe/consumer)
@@ -19,7 +18,7 @@ Maintain data integrity with an external source of truth.  Keep dataobjects up t
 ## Use Case
 Where there is an external source of truth that a dataobject needs to be updated from.
 
-An [example](https://github.com/AntonyThorpe/silvershop-unleashed) is an eCommerce website where the product prices need to be kept in alignment with an online inventory system (which is used post-sale to manage fulfilment of an order).  With the eCommerce site being a subset of the total inventory items in stock, updating, without creating new product items, is required.  The pricing and other properties change frequently.  Based upon the philosophy of *entering data only once* a sync from the external source of truth would keep the website accurate, up to date and reduce end user maintenance.
+An [example](https://github.com/AntonyThorpe/silvershop-unleashed) is an eCommerce website where the product prices need to be kept in alignment with an online inventory system (which is used post-sale to manage fulfilment of an order).  With the eCommerce website being a subset of the total inventory items in stock, updating, without creating new product items, is required.  The pricing and other properties change frequently.  Based upon the philosophy of *entering data only once* a sync from the external source of truth would keep the website accurate, up to date and reduce maintenance.
 
 ## How to use
 * Subclass `\AntonyThorpe\Consumer\BulkLoader` and set your column map between the external API fields and the dataobject (see docs and tests folder for guidance).
