@@ -6,6 +6,9 @@
 	"require": {
 		"silverstripe/framework": "^5.0.0"
 	},
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.7.2"
+	},
     "autoload": {
         "psr-4": {
             "AntonyThorpe\\Consumer\\": "src/",

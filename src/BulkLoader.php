@@ -2,6 +2,7 @@
 
 namespace AntonyThorpe\Consumer;
 
+use SilverStripe\ORM\DataList;
 use SilverStripe\Core\Environment;
 use SilverStripe\CMS\Model\SiteTree;
 use SilverStripe\ORM\ValidationException;
@@ -28,49 +29,44 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
      * Can include dot notations.
      * @var array
      */
-    public $mappableFields = array();
+    public $mappableFields = [];
 
     /**
      * Transformation and relation handling
      * @var array
      */
-    public $transforms = array();
+    public $transforms = [];
 
     /**
      * Specify a colsure to be run on every imported record.
-     * @var function
+     * @var callable
      */
     public $recordCallback;
 
     /**
      * Bulk loading source
-     * @var BulkLoaderSource
      */
-    protected $source;
+    protected BulkLoaderSource $source;
 
     /**
      * Add new records while importing
-     * @var Boolean
      */
-    protected $addNewRecords = true;
+    protected bool $addNewRecords = true;
 
     /**
      * The default behaviour for linking relations
-     * @var boolean
      */
-    protected $relationLinkDefault = true;
+    protected bool $relationLinkDefault = true;
 
     /**
      * The default behaviour creating relations
-     * @var boolean
      */
-    protected $relationCreateDefault = true;
+    protected bool $relationCreateDefault = true;
 
     /**
      * Determines whether pages should be published during loading
-     * @var boolean
      */
-    protected $publishPages = true;
+    protected bool $publishPages = true;
 
     /**
      * Cache the result of getMappableColumns
@@ -80,9 +76,8 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Set the BulkLoaderSource for this BulkLoader.
-     * @param BulkLoaderSource $source
      */
-    public function setSource(BulkLoaderSource $source)
+    public function setSource(BulkLoaderSource $source) :static
     {
         $this->source = $source;
         return $this;
@@ -90,19 +85,16 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Get the BulkLoaderSource for this BulkLoader
-     * @return \AntonyThorpe\Consumer\BulkLoaderSource $source
      */
-    public function getSource()
+    public function getSource(): BulkLoaderSource
     {
         return $this->source;
     }
 
     /**
      * Set the default behaviour for linking existing relation objects.
-     * @param boolean $default
-     * @return \AntonyThorpe\Consumer\BulkLoader
      */
-    public function setRelationLinkDefault($default)
+    public function setRelationLinkDefault(bool $default): self
     {
         $this->relationLinkDefault = $default;
         return $this;
@@ -110,10 +102,8 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Set the default behaviour for creating new relation objects.
-     * @param boolean $default
-     * @return \AntonyThorpe\Consumer\BulkLoader
      */
-    public function setRelationCreateDefault($default)
+    public function setRelationCreateDefault(bool $default): self
     {
         $this->relationCreateDefault = $default;
         return $this;
@@ -121,10 +111,8 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Set pages to published upon upload
-     * @param boolean $default
-     * @return \AntonyThorpe\Consumer\BulkLoader
      */
-    public function setPublishPages($dopubilsh)
+    public function setPublishPages(bool $dopubilsh): self
     {
         $this->publishPages = $dopubilsh;
         return $this;
@@ -133,16 +121,15 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
     /**
      * Delete all existing records
      */
-    public function deleteExistingRecords()
+    public function deleteExistingRecords(): void
     {
         DataObject::get($this->objectClass)->removeAll();
     }
 
     /**
      * Get the DataList of objects this loader applies to.
-     * @return \SilverStripe\ORM\DataList
      */
-    public function getDataList()
+    public function getDataList(): DataList
     {
         $class = $this->objectClass;
         return $class::get();
@@ -153,20 +140,18 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
      * Useful to analyze the input and give the users a chance to influence
      * it through a UI.
      * @param string $filepath Absolute path to the file we're importing
-     * @return array See {@link self::processAll()}
+     * See {@link self::processAll()}
      */
-    public function preview($filepath)
+    public function preview($filepath): array
     {
-        return null;
+        return [];
     }
-
-
 
     /**
      * Start loading of data
      * @param  string  $filepath
-     * @param  boolean $preview  Create results but don't write
-     * @return \AntonyThorpe\Consumer\BulkLoaderResult
+     * @param  bool $preview  Create results but don't write
+     * @return BulkLoaderResult
      */
     public function load($filepath = null, $preview = false)
     {
@@ -179,11 +164,10 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Import all records from the source
-     * @param  string  $filepath
-     * @param  boolean $preview
-     * @return \AntonyThorpe\Consumer\BulkLoaderResult
+     * @param  string $filepath
+     * @param  bool $preview
      */
-    protected function processAll($filepath, $preview = false)
+    protected function processAll($filepath, $preview = false): BulkLoaderResult
     {
         if (!$this->source) {
             user_error(
@@ -191,7 +175,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
                 E_USER_WARNING
             );
         }
-        $results = new BulkLoaderResult();
+        $results = BulkLoaderResult::create();
         $iterator = $this->getSource()->getIterator();
         foreach ($iterator as $record) {
             $this->processRecord($record, $this->columnMap, $results, $preview);
@@ -200,21 +184,19 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
         return $results;
     }
 
-
     /**
      * Process a single record from source
-     * @param object $record
+     * @param array $record An map of the data, keyed by the header field defined in {@link self::$columnMap}
      * @param array $columnMap
-     * @param boolean $preview
      * @param BulkLoaderResult $results
-     * @param string $preview set to true to prevent writing to the dataobject
-     * @return \AntonyThorpe\Consumer\BulkLoaderResult
+     * @param bool $preview set to true to prevent writing to the dataobject
+     * @return BulkLoaderResult|null
      */
     protected function processRecord($record, $columnMap, &$results, $preview = false)
     {
-        if (!is_array($record) || empty($record) || !array_filter($record)) {
+        if (!is_array($record) || $record === [] || !array_filter($record)) {
             $results->addSkipped("Empty/invalid record data.");
-            return;
+            return null;
         }
 
         //map incoming record according to the standardisation mapping (columnMap)
@@ -222,13 +204,13 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
         //skip if required data is not present
         if (!$this->hasRequiredData($record)) {
             $results->addSkipped("Required data is missing.");
-            return;
+            return null;
         }
         $modelClass = $this->objectClass;
         $placeholder = new $modelClass();
 
         //populate placeholder object with transformed data
-        foreach ($this->mappableFields_cache as $field => $label) {
+        foreach (array_keys($this->mappableFields_cache) as $field) {
             //skip empty fields
             if (!isset($record[$field]) || empty($record[$field])) {
                 continue;
@@ -240,7 +222,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
         $existing = null;
         $data = $placeholder->getQueriedDatabaseFields();
 
-        if (!$placeholder->ID && !empty($this->duplicateChecks)) {
+        if (!$placeholder->ID && $this->duplicateChecks !== []) {
             $mapped_values = array_values($this->columnMap);
             //don't match on ID, ClassName or RecordClassName
             unset($data['ID'], $data['ClassName'], $data['RecordClassName']);
@@ -264,7 +246,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
             // new record
             if (!$this->addNewRecords) {
                 $results->addSkipped('New record not added');
-                return;
+                return null;
             }
             $obj = $placeholder;
         }
@@ -291,10 +273,8 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
             if (!$preview) {
                 $obj->write();
 
-                if ($obj instanceof SiteTree) {
-                    if ($obj->isPublished() || $this->publishPages) {
-                        $obj->publish('Stage', 'Live');
-                    }
+                if ($obj instanceof SiteTree && ($obj->isPublished() || $this->publishPages)) {
+                    $obj->publish('Stage', 'Live');
                 }
 
                 $obj->flushCache(); // avoid relation caching confusion
@@ -318,12 +298,11 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Convert the record's keys to the appropriate columnMap keys
-     * @return array record
      */
-    protected function columnMapRecord($record)
+    protected function columnMapRecord(array $record): array
     {
         $adjustedmap = $this->columnMap;
-        $newrecord = array();
+        $newrecord = [];
         foreach ($record as $field => $value) {
             if (isset($adjustedmap[$field])) {
                 $newrecord[$adjustedmap[$field]] = $value;
@@ -337,17 +316,14 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Check if the given mapped record has the required data.
-     * @param  array $mappedrecord
-     * @return boolean
      */
-    protected function hasRequiredData($mappedrecord)
+    protected function hasRequiredData(array $mappedrecord): bool
     {
-        if (!is_array($mappedrecord) || empty($mappedrecord) || !array_filter($mappedrecord)) {
+        if (!is_array($mappedrecord) || $mappedrecord === [] || !array_filter($mappedrecord)) {
             return false;
         }
         foreach ($this->transforms as $field => $t) {
-            if (
-                is_array($t) &&
+            if (is_array($t) &&
                 isset($t['required']) &&
                 $t['required'] === true &&
                 (!isset($mappedrecord[$field]) ||
@@ -361,11 +337,8 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Perform field transformation or setting of data on placeholder.
-     * @param  \SilverStripe\ORM\DataObject $placeholder
-     * @param  string $field
-     * @param  mixed $value
      */
-    protected function transformField($placeholder, $field, $value)
+    protected function transformField(DataObject $placeholder, string $field, mixed $value): void
     {
         $callback = isset($this->transforms[$field]['callback']) &&
                     is_callable($this->transforms[$field]['callback']) ?
@@ -376,17 +349,13 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
             $relationName = null;
             $columnName = null;
             //extract relationName and columnName, if present
-            if (strpos($field, '.') !== false) {
-                list($relationName, $columnName) = explode('.', $field);
+            if (str_contains($field, '.')) {
+                [$relationName, $columnName] = explode('.', $field);
             } else {
                 $relationName = $field;
             }
             //get the list that relation is added to/checked on
-            if (isset($this->transforms[$field]['list'])) {
-                $relationlist = $this->transforms[$field]['list'];
-            } else {
-                $relationlist = null;
-            }
+            $relationlist = $this->transforms[$field]['list'] ?? null;
 
             //check for the same relation set on the current record
             if ($placeholder->{$relationName."ID"}) {
@@ -437,7 +406,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
                 if ($relationlist && !$relationlist->byID($relation->ID)) {
                     $relationlist->add($relation);
                 }
-            } catch (ValidationException $e) {
+            } catch (ValidationException) {
                 $relation = null;
             }
             //add the relation id to the placeholder
@@ -451,24 +420,22 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
                 $value = $callback($value, $placeholder);
             }
             //set field value
-            $placeholder->update(array(
+            $placeholder->update([
                 $field => $value
-            ));
+            ]);
         }
     }
 
     /**
      * Detect if a given record field is a relation field.
-     * @param  string  $field
-     * @return boolean
      */
-    protected function isRelation($field)
+    protected function isRelation(string $field): bool
     {
         //get relation name from dot notation
-        if (strpos($field, '.') !== false) {
-            list($field, $columnName) = explode('.', $field);
+        if (str_contains($field, '.')) {
+            [$field, $columnName] = explode('.', $field);
         }
-        $has_ones = singleton($this->objectClass)->hasOne();
+        $has_ones = DataObject::singleton($this->objectClass)->hasOne();
         //check if relation is present in has ones
         return isset($has_ones[$field]);
     }
@@ -476,17 +443,15 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
     /**
      * Given a record field name, find out if this is a relation name
      * and return the name
-     * @param string
-     * @return string
      */
-    protected function getRelationName($recordField)
+    protected function getRelationName(string $recordField): string
     {
         $relationName = null;
         if (isset($this->relationCallbacks[$recordField])) {
             $relationName = $this->relationCallbacks[$recordField]['relationname'];
         }
-        if (strpos($recordField, '.') !== false) {
-            list($relationName, $columnName) = explode('.', $recordField);
+        if (str_contains((string) $recordField, '.')) {
+            [$relationName, $columnName] = explode('.', (string) $recordField);
         }
 
         return $relationName;
@@ -495,10 +460,8 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
     /**
      * Find an existing objects based on one or more uniqueness columns
      * specified via {@link self::$duplicateChecks}
-     * @param array $record data
-     * @return mixed
      */
-    public function findExistingObject($record)
+    public function findExistingObject(array $record): mixed
     {
         // checking for existing records (only if not already found)
         foreach ($this->duplicateChecks as $fieldName => $duplicateCheck) {
@@ -506,8 +469,8 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
             if (is_string($duplicateCheck)) {
                 $fieldName = $duplicateCheck;
                 //If the dupilcate check is a dot notation, then convert to ID relation
-                if (strpos($duplicateCheck, '.') !== false) {
-                    list($relationName, $columnName) = explode('.', $duplicateCheck);
+                if (str_contains($duplicateCheck, '.')) {
+                    [$relationName, $columnName] = explode('.', $duplicateCheck);
                     $fieldName = $relationName."ID";
                 }
                 //@todo also convert plain relation names to include ID
@@ -544,15 +507,14 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Get the field-label mapping of fields that data can be mapped into.
-     * @return array
      */
-    public function getMappableColumns()
+    public function getMappableColumns(): array
     {
-        if (!empty($this->mappableFields)) {
+        if ($this->mappableFields !== []) {
             return $this->mappableFields;
         }
         $scaffolded = $this->scaffoldMappableFields();
-        if (!empty($this->transforms)) {
+        if ($this->transforms !== []) {
             $transformables = array_keys($this->transforms);
             $transformables = array_combine($transformables, $transformables);
             $scaffolded = array_merge($transformables, $scaffolded);
@@ -564,21 +526,17 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Generate a field-label list of fields that data can be mapped into.
-     * @param boolean $includerelations
-     * @return array
      */
-    public function scaffoldMappableFields($includerelations = true)
+    public function scaffoldMappableFields(bool $includerelations = true): array
     {
         $map = $this->getMappableFieldsForClass($this->objectClass);
         //set up 'dot notation' (Relation.Field) style mappings
-        if ($includerelations) {
-            if ($has_ones = singleton($this->objectClass)->hasOne()) {
-                foreach ($has_ones as $relationship => $type) {
-                    $fields = $this->getMappableFieldsForClass($type);
-                    foreach ($fields as $field => $title) {
-                        $map[$relationship.".".$field] =
-                            $this->formatMappingFieldLabel($relationship, $title);
-                    }
+        if ($includerelations && ($has_ones = DataObject::singleton($this->objectClass)->hasOne())) {
+            foreach ($has_ones as $relationship => $type) {
+                $fields = $this->getMappableFieldsForClass($type);
+                foreach ($fields as $field => $title) {
+                    $map[$relationship.".".$field] =
+                        $this->formatMappingFieldLabel($relationship, $title);
                 }
             }
         }
@@ -588,14 +546,12 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Get the fields and labels for a given class
-     * @param  string $class
-     * @return array fields
      */
-    protected function getMappableFieldsForClass($class)
+    protected function getMappableFieldsForClass(string $class): array
     {
-        $singleton = singleton($class);
+        $singleton = DataObject::singleton($class);
         $fields = (array)$singleton->fieldLabels(false);
-        foreach ($fields as $field => $label) {
+        foreach (array_keys($fields) as $field) {
             if (!$singleton->hasField($field)) {
                 unset($fields[$field]);
             }
@@ -605,10 +561,8 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Format mapping field laabel
-     * @param  string $relationship
-     * @param  string $title
      */
-    protected function formatMappingFieldLabel($relationship, $title)
+    protected function formatMappingFieldLabel(string $relationship, string $title): string
     {
         return sprintf("%s: %s", $relationship, $title);
     }
@@ -616,7 +570,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
     /**
      * Check that the class has the required settings
      */
-    public function preprocessChecks()
+    public function preprocessChecks(): void
     {
         // Checks
         if (!$this->objectClass) {
@@ -642,16 +596,10 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Update the dataobject with data from the external API
-     *
-     * @param array $apidata An array of arrays
-     * @param boolean $preview Set to true to not write
-     * @return \AntonyThorpe\Consumer\BulkLoaderResult
      */
-    public function updateRecords(array $apidata, $preview = false)
+    public function updateRecords(array $apidata, bool $preview = false): BulkLoaderResult
     {
-        if (is_array($apidata)) {
-            $this->setSource(new ArrayBulkLoaderSource($apidata));
-        }
+        $this->setSource(new ArrayBulkLoaderSource($apidata));
         $this->addNewRecords = false;
         $this->preprocessChecks();
         return $this->load(null, $preview);
@@ -659,35 +607,23 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
 
     /**
      * Update/create many dataobjects with data from the external api
-     *
-     * @param array $apidata
-     * @param boolean $preview Set to true to not write
-     * @return BulkLoaderResult
      */
-    public function upsertManyRecords(array $apidata, $preview = false)
+    public function upsertManyRecords(array $apidata, bool $preview = false): BulkLoaderResult
     {
-        if (is_array($apidata)) {
-            $this->setSource(new ArrayBulkLoaderSource($apidata));
-        }
+        $this->setSource(new ArrayBulkLoaderSource($apidata));
         $this->preprocessChecks();
         return $this->load(null, $preview);
     }
 
     /**
      * Delete dataobjects that match to the API data
-     *
-     * @param array $apidata
-     * @param boolean $preview Set to true to not write
-     * @return \AntonyThorpe\Consumer\BulkLoaderResult
      */
-    public function deleteManyRecords(array $apidata, $preview = false)
+    public function deleteManyRecords(array $apidata, bool $preview = false): BulkLoaderResult
     {
-        if (is_array($apidata)) {
-            $this->setSource(new ArrayBulkLoaderSource($apidata));
-        }
+        $this->setSource(new ArrayBulkLoaderSource($apidata));
         $this->preprocessChecks();
         $this->mappableFields_cache = $this->getMappableColumns();
-        $results = new BulkLoaderResult();
+        $results = BulkLoaderResult::create();
         $iterator = $this->getSource()->getIterator();
         foreach ($iterator as $record) {
             //map incoming record according to the standardisation mapping (columnMap)
@@ -698,7 +634,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
             $placeholder = new $modelClass();
 
             //populate placeholder object with transformed data
-            foreach ($this->mappableFields_cache as $field => $label) {
+            foreach (array_keys($this->mappableFields_cache) as $field) {
                 //skip empty fields
                 if (!isset($record[$field]) || empty($record[$field])) {
                     continue;
@@ -727,26 +663,22 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
      * @param  array   $apidata An array of arrays
      * @param  string  $key The key that matches the column within the Object Class
      * @param  string  $property_name The property name of the class that matches to the key from the API data
-     * @param  boolean $preview Set to true to not save
-     * @return \AntonyThorpe\Consumer\BulkLoaderResult
+     * @param  bool $preview Set to true to skip saving
+     * @return BulkLoaderResult
      */
-    public function clearAbsentRecords(array $apidata, $key, $property_name, $preview = false)
+    public function clearAbsentRecords(array $apidata, string $key, string $property_name, bool $preview = false)
     {
-        $results = new BulkLoaderResult();
+        $results = BulkLoaderResult::create();
         $modelClass = $this->objectClass;
 
         foreach ($modelClass::get() as $record) {
             $property_value = $record->{$property_name};
-
             if (!empty($property_value)) {
                 $match = array_filter(
                     $apidata,
-                    function ($value) use ($key, $property_value) {
-                        return $value[$key] == $property_value;
-                    }
+                    fn($value): bool => $value[$key] == $property_value
                 );
-
-                if (empty($match)) { // The property value doesn't exist in the API data (therefore clear)
+                if ($match === []) { // The property value doesn't exist in the API data (therefore clear)
                     $record->{$property_name} = "";
                     $results->addUpdated($record, _t('Consumer.CLEARABSENT', 'Clear absent'), $this->duplicateChecks);
                     if (!$preview) {

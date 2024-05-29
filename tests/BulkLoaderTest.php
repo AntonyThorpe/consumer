@@ -5,53 +5,53 @@ namespace AntonyThorpe\Consumer\Tests;
 use SilverStripe\Dev\SapphireTest;
 use AntonyThorpe\Consumer\BulkLoader;
 use AntonyThorpe\Consumer\ArrayBulkLoaderSource;
-use AntonyThorpe\Consumer\Tests\Person;
-use AntonyThorpe\Consumer\Tests\Country;
+use AntonyThorpe\Consumer\Tests\Model\Person;
+use AntonyThorpe\Consumer\Tests\Model\Country;
 
 class BulkLoaderTest extends SapphireTest
 {
-    protected static $fixture_file = 'fixtures/BulkLoaderTest.yml';
+    protected static $fixture_file = ['Fixtures/BulkLoaderTest.yml'];
 
     protected static $extra_dataobjects = [
         Person::class,
         Country::class
     ];
 
-    public function testLoading()
+    public function testLoading(): void
     {
-        $loader = new BulkLoader('AntonyThorpe\Consumer\Tests\Person');
+        $loader = BulkLoader::create(Person::class);
 
-        $loader->columnMap = array(
+        $loader->columnMap = [
             "first name" => "FirstName",
             "last name" => "Surname",
             "name" => "Name",
             "age" => "Age",
             "country" => "Country.Code",
-        );
+        ];
 
-        $loader->transforms = array(
-            "Name" => array(
-                'callback' => function ($value, $obj) {
+        $loader->transforms = [
+            "Name" => [
+                'callback' => function ($value, $obj): void {
                     $name =  explode(" ", $value);
                     $obj->FirstName = $name[0];
                     $obj->Surname = $name[1];
                 }
-            ),
-            "Country.Code" => array(
+            ],
+            "Country.Code" => [
                 "link" => true, //link up to existing relations
                 "create" => false //don't create new relation objects
-            )
-        );
+            ]
+        ];
 
-        $loader->duplicateChecks = array(
+        $loader->duplicateChecks = [
             "FirstName"
-        );
+        ];
 
         //set the source data
-        $data = array(
-            array("name" => "joe bloggs", "age" => "62", "country" => "NZ"),
-            array("name" => "alice smith", "age" => "24", "country" => "AU")
-        );
+        $data = [
+            ["name" => "joe bloggs", "age" => "62", "country" => "NZ"],
+            ["name" => "alice smith", "age" => "24", "country" => "AU"]
+        ];
         $loader->setSource(new ArrayBulkLoaderSource($data));
 
         $results = $loader->load();
@@ -72,41 +72,41 @@ class BulkLoaderTest extends SapphireTest
         $this->assertEquals($joe->Country()->Code, "NZ");
     }
 
-    public function testLoadUpdatesOnly()
+    public function testLoadUpdatesOnly(): void
     {
         //Set up some existing dataobjects
-        Person::create(array("FirstName" => "joe", "Surname" => "Kiwi", "Age" => "62", "CountryID" => 1))->write();
-        Person::create(array("FirstName" => "bruce", "Surname" => "Aussie", "Age" => "24", "CountryID" => 2))->write();
+        Person::create(["FirstName" => "joe", "Surname" => "Kiwi", "Age" => "62", "CountryID" => 1])->write();
+        Person::create(["FirstName" => "bruce", "Surname" => "Aussie", "Age" => "24", "CountryID" => 2])->write();
         $this->assertEquals(
             2,
             Person::get()->Count(),
             "Two people exist in Person class"
         );
 
-        $loader = new BulkLoader('AntonyThorpe\Consumer\Tests\Person');
+        $loader = BulkLoader::create(Person::class);
         $loader->addNewRecords = false;  // don't add new records from source
-        $loader->columnMap = array(
+        $loader->columnMap = [
             "firstname" => "FirstName",
             "surname" => "Surname",
             "age" => "Age",
             "country" => "Country.Code"
-        );
-        $loader->transforms = array(
-            "Country.Code" => array(
+        ];
+        $loader->transforms = [
+            "Country.Code" => [
                 "link" => true, //link up to existing relations
                 "create" => false //don't create new relation objects
-            )
-        );
-        $loader->duplicateChecks = array(
+            ]
+        ];
+        $loader->duplicateChecks = [
             "FirstName"
-        );
+        ];
         //set the source data.  Joe has aged one year and shifted to Australia.  Bruce has aged a year too, but is missing other elements, which should remain the same.
-        $data = array(
-            array("firstname" => "joe", "surname" => "Kiwi", "age" => "63", "country" => "AU"),
-            array("firstname" => "bruce", "age" => "25"),
-            array("firstname" => "NotEntered", "surname" => "should not be entered", "age" => "33", "country" => "NZ"),
-            array("firstname" => "NotEntered2", "surname" => "should not be entered as well", "age" => "24", "country" => "AU")
-        );
+        $data = [
+            ["firstname" => "joe", "surname" => "Kiwi", "age" => "63", "country" => "AU"],
+            ["firstname" => "bruce", "age" => "25"],
+            ["firstname" => "NotEntered", "surname" => "should not be entered", "age" => "33", "country" => "NZ"],
+            ["firstname" => "NotEntered2", "surname" => "should not be entered as well", "age" => "24", "country" => "AU"]
+        ];
         $loader->setSource(new ArrayBulkLoaderSource($data));
 
         $results = $loader->load();
@@ -129,43 +129,41 @@ class BulkLoaderTest extends SapphireTest
         $this->assertSame(2, (int)$bruce->CountryID, 'Bruce should still have the CountryID for Australia');
     }
 
-    public function testTransformCallback()
+    public function testTransformCallback(): void
     {
-        $loader = new BulkLoader('AntonyThorpe\Consumer\Tests\Person');
-        $data = array(
-            array("FirstName" => "joe", "age" => "62", "country" => "NZ")
-        );
+        $loader = BulkLoader::create(Person::class);
+        $data = [
+            ["FirstName" => "joe", "age" => "62", "country" => "NZ"]
+        ];
         $loader->setSource(new ArrayBulkLoaderSource($data));
-        $loader->transforms = array(
-            'FirstName' => array(
-                'callback' => function ($value) {
-                    return strtoupper($value);
-                }
-            )
-        );
+        $loader->transforms = [
+            'FirstName' => [
+                'callback' => fn($value): string => strtoupper((string) $value)
+            ]
+        ];
         $results = $loader->load();
         $this->assertEquals($results->CreatedCount(), 1);
         $result = $results->Created()->first();
         $this->assertEquals("JOE", $result->FirstName, "First name has been transformed");
     }
 
-    public function testRequiredFields()
+    public function testRequiredFields(): void
     {
-        $loader = new BulkLoader('AntonyThorpe\Consumer\Tests\Person');
-        $data = array(
-            array("FirstName" => "joe", "Surname" => "Bloggs"), //valid
-            array("FirstName" => 0, "Surname" => "Bloggs"), //invalid firstname
-            array("FirstName" => null), //invalid firstname
-            array("FirstName" => "", "Surname" => ""), //invalid firstname
-            array("age" => "25", "Surname" => "Smith"), //invalid firstname
-            array("FirstName" => "Jane"), //valid
-        );
+        $loader = BulkLoader::create(Person::class);
+        $data = [
+            ["FirstName" => "joe", "Surname" => "Bloggs"], //valid
+            ["FirstName" => 0, "Surname" => "Bloggs"], //invalid firstname
+            ["FirstName" => null], //invalid firstname
+            ["FirstName" => "", "Surname" => ""], //invalid firstname
+            ["age" => "25", "Surname" => "Smith"], //invalid firstname
+            ["FirstName" => "Jane"], //valid
+        ];
         $loader->setSource(new ArrayBulkLoaderSource($data));
-        $loader->transforms = array(
-            'FirstName' => array(
+        $loader->transforms = [
+            'FirstName' => [
                 'required' => true
-            )
-        );
+            ]
+        ];
         $results = $loader->load();
         $this->assertEquals(2, $results->CreatedCount(), "Created 2");
         $this->assertEquals(4, $results->SkippedCount(), "Skipped 4");

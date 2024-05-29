@@ -7,14 +7,14 @@ use AntonyThorpe\Consumer\Consumer;
 
 class ConsumerModelTest extends SapphireTest
 {
-    public function testCreateUpdate()
+    public function testCreateUpdate(): void
     {
-        $apidata = json_decode($this->jsondata, true);
+        $apidata = (array) json_decode($this->jsondata, true);
         $dataobject = Consumer::create(
-            array(
+            [
                 'Title' => 'ProductUpdate',
                 'ExternalLastEditedKey' => 'lastmodified'
-            )
+            ]
         )->setMaxExternalLastEdited($apidata);
         $id = $dataobject->write();
 
@@ -36,14 +36,14 @@ class ConsumerModelTest extends SapphireTest
         );
     }
 
-    public function testCreateUpdateWithUnixDateFormat()
+    public function testCreateUpdateWithUnixDateFormat(): void
     {
-        $apidata = json_decode($this->jsondata2, true);
+        $apidata = (array) json_decode($this->jsondata2, true);
         $dataobject = Consumer::create(
-            array(
+            [
                 'Title' => 'ProductUpdate2',
                 'ExternalLastEditedKey' => 'lastmodified'
-            )
+            ]
         )->setMaxExternalLastEdited($apidata);
         $id = $dataobject->write();
 
@@ -55,14 +55,14 @@ class ConsumerModelTest extends SapphireTest
         );
     }
 
-    public function testCreateUpdateWithUnixDateFormatInMilliseconds()
+    public function testCreateUpdateWithUnixDateFormatInMilliseconds(): void
     {
-        $apidata = json_decode($this->jsondata3, true);
+        $apidata = (array) json_decode($this->jsondata3, true);
         $dataobject = Consumer::create(
-            array(
+            [
                 'Title' => 'ProductUpdate3',
                 'ExternalLastEditedKey' => 'lastmodified'
-            )
+            ]
         )->setMaxExternalLastEdited($apidata);
         $id = $dataobject->write();
 

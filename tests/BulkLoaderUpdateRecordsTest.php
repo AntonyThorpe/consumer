@@ -4,15 +4,17 @@ namespace AntonyThorpe\Consumer\Tests;
 
 use SilverStripe\Core\Convert;
 use SilverStripe\Dev\SapphireTest;
-use AntonyThorpe\Consumer\Tests\User;
-use AntonyThorpe\Consumer\Tests\Product;
+use AntonyThorpe\Consumer\Tests\Loader\ProductBulkLoader;
+use AntonyThorpe\Consumer\Tests\Loader\UserBulkLoader;
+use AntonyThorpe\Consumer\Tests\Model\User;
+use AntonyThorpe\Consumer\Tests\Model\Product;
 
 class BulkLoaderUpdateRecordsTest extends SapphireTest
 {
-    protected static $fixture_file = array(
-        'fixtures/User.yml',
-        'fixtures/Product.yml'
-    );
+    protected static $fixture_file = [
+        'Fixtures/User.yml',
+        'Fixtures/Product.yml'
+    ];
 
     protected static $extra_dataobjects = [
         User::class,
@@ -24,16 +26,17 @@ class BulkLoaderUpdateRecordsTest extends SapphireTest
         parent::setUp();
 
         //publish some product categories and products so as to test the Live version
-        $this->objFromFixture(Product::class, 'products')->copyVersionToStage('Stage', 'Live');
+        $test = $this->objFromFixture(Product::class, 'products');
+        $test->copyVersionToStage('Stage', 'Live');
         $this->objFromFixture(Product::class, 'pm1')->copyVersionToStage('Stage', 'Live');
         $this->objFromFixture(Product::class, 'pm2')->copyVersionToStage('Stage', 'Live');
         $this->objFromFixture(Product::class, 'pm3')->copyVersionToStage('Stage', 'Live');
     }
 
-    public function testUpdateRecords()
+    public function testUpdateRecords(): void
     {
-        $apidata = json_decode($this->jsondata1, true);
-        $results = UserBulkLoader::create('AntonyThorpe\Consumer\Tests\User')->updateRecords($apidata);
+        $apidata = (array) json_decode($this->jsondata1, true);
+        $results = UserBulkLoader::create(User::class)->updateRecords($apidata);
 
         // Check Results
         $this->assertEquals($results->CreatedCount(), 0);
@@ -84,11 +87,11 @@ class BulkLoaderUpdateRecordsTest extends SapphireTest
         );
     }
 
-    public function testUpdateRecordsWithPreview()
+    public function testUpdateRecordsWithPreview(): void
     {
         $original_count = User::get()->count();
-        $apidata = json_decode($this->jsondata1, true);
-        UserBulkLoader::create('AntonyThorpe\Consumer\Tests\User')->updateRecords($apidata, true);
+        $apidata = (array) json_decode($this->jsondata1, true);
+        UserBulkLoader::create(User::class)->updateRecords($apidata, true);
 
         $this->assertEquals(
             $original_count,
@@ -121,18 +124,18 @@ class BulkLoaderUpdateRecordsTest extends SapphireTest
         );
     }
 
-    public function testUpdateRecordsWhenDataobjectExtendsPage()
+    public function testUpdateRecordsWhenDataobjectExtendsPage(): void
     {
-        $apidata = json_decode($this->jsondata2, true);
-        $loader = ProductBulkLoader::create('AntonyThorpe\Consumer\Tests\Product');
-        $loader->transforms = array(
-            'Title' => array(
+        $apidata = (array) json_decode($this->jsondata2, true);
+        $loader = ProductBulkLoader::create(Product::class);
+        $loader->transforms = [
+            'Title' => [
                 'callback' => function ($value, &$placeholder) {
                     $placeholder->URLSegment = Convert::raw2url($value);
                     return $value;
                 }
-            )
-        );
+            ]
+        ];
         $results = $loader->updateRecords($apidata);
 
         // Check Results

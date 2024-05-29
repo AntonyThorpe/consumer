@@ -1,4 +1,4 @@
-AntonyThorpe\Consumer\Tests\Product:
+AntonyThorpe\Consumer\Tests\Model\Product:
   products:
     Title: Shop
     URLSegment: shop
@@ -11,7 +11,7 @@ AntonyThorpe\Consumer\Tests\Product:
     BasePrice: 99.99
     URLSegment: alien
     Content: <p>This is some content</p>
-    Parent: =>AntonyThorpe\Consumer\Tests\Product.products
+    Parent: =>AntonyThorpe\Consumer\Tests\Model\Product.products
     ShowInMenus: 0
     ShowInSearch: 0
   pm2:
@@ -20,7 +20,7 @@ AntonyThorpe\Consumer\Tests\Product:
     BasePrice: 12345.89
     URLSegment: book
     Content: <p>This is some content</p>
-    Parent: =>AntonyThorpe\Consumer\Tests\Product.products
+    Parent: =>AntonyThorpe\Consumer\Tests\Model\Product.products
     ShowInMenus: 1
     ShowInSearch: 1
   pm3:
@@ -29,6 +29,6 @@ AntonyThorpe\Consumer\Tests\Product:
     BasePrice: 100.00
     URLSegment: chariot
     Content: <p>This is some content</p>
-    Parent: =>AntonyThorpe\Consumer\Tests\Product.products
+    Parent: =>AntonyThorpe\Consumer\Tests\Model\Product.products
     ShowInMenus: 1
     ShowInSearch: 0

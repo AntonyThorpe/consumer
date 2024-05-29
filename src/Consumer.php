@@ -8,25 +8,31 @@ use Exception;
 
 /**
  * Record the LastEdited date provided from external data
+ * @property string $Title provides a name against the API call
+ * @property string $ExternalLastEditedKey is the key that labels the last date the call was made
+ * @property Datetime $ExternalLastEdited is the last modified date from the external API data
  */
 class Consumer extends DataObject
 {
-    private static $table_name = 'Consumer';
+    /**
+     * @config
+     */
+    private static string $table_name = 'Consumer';
 
     /**
      * Save the maximum data using setExternalLastEdited method.  Can use it to filter future calls to the API.
-     * @var array
-     * @property Title provides a name against the API call
-     * @property ExternalLastEditedKey is the key that labels the last date the call was made
-     * @property ExternalLastEdited is the last modified date from the external API data
+     * @config
      */
-    private static $db = [
+    private static array $db = [
         'Title' => 'Varchar(250)',
         'ExternalLastEditedKey' => 'Varchar(100)',
         'ExternalLastEdited' => 'Datetime'
     ];
 
-    public static function convertUnix2UTC($data)
+    /**
+     * Convert a Unix date to a UTC
+     */
+    public static function convertUnix2UTC(string $data): string
     {
         $string = preg_replace('/\D/', '', $data);
         $date = new DateTime();
@@ -43,18 +49,16 @@ class Consumer extends DataObject
     /**
      * Determine if the string is a Unix Timestamp
      * @link(Stack Overflow, http://stackoverflow.com/questions/2524680/check-whether-the-string-is-a-unix-timestamp)
-     * @param  string $string
-     * @return boolean
      */
-    public static function isTimestamp($string)
+    public static function isTimestamp(string $string): bool
     {
-        if (substr($string, 0, 5) == "/Date") {
+        if (str_starts_with($string, "/Date")) {
             return true;
         }
 
         try {
             new DateTime('@' . $string);
-        } catch (Exception $e) {
+        } catch (Exception) {
             return false;
         }
         return true;
@@ -62,10 +66,8 @@ class Consumer extends DataObject
 
     /**
      * Set the ExternalLastEdited to the maximum last edited date
-     * @param array $apidata
-     * @return $this
      */
-    public function setMaxExternalLastEdited(array $apidata)
+    public function setMaxExternalLastEdited(array $apidata): static
     {
         $external_last_edited_key = $this->ExternalLastEditedKey;
 
@@ -77,9 +79,7 @@ class Consumer extends DataObject
             );
         }
 
-        $dates = array_map(function ($item) use ($external_last_edited_key) {
-            return $item[$external_last_edited_key];
-        }, $apidata);
+        $dates = array_map(fn($item) => $item[$external_last_edited_key], $apidata);
         $max_date = max($dates);
 
         if (self::isTimestamp($max_date)) {

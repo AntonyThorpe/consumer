@@ -2,72 +2,68 @@
 
 namespace AntonyThorpe\Consumer;
 
+use SilverStripe\Dev\BulkLoader_Result;
+use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\ArrayList;
 use SilverStripe\View\ArrayData;
 
 /**
  * Store result information about a BulkLoader import
  */
-class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
+class BulkLoaderResult extends BulkLoader_Result
 {
     /**
      * Keep track of skipped records.
-     * @var array
      */
-    protected $skipped = array();
+    protected array $skipped = [];
 
-    /**
-     * @return int
-     */
-    public function SkippedCount()
+    public function SkippedCount(): int
     {
         return count($this->skipped);
     }
 
-
     /**
-     * @param string $message Reason for skipping
+     * Reason for skipping
      */
-    public function addSkipped($message = null)
+    public function addSkipped(string $message = ''): void
     {
-        $this->skipped[] = array(
+        $this->skipped[] = [
             'Message' => $message
-        );
+        ];
     }
 
     /**
-     * Get an array of messages describing the result.
-     * @return array messages
+     * Get an array of messages describing the result
      */
-    public function getMessageList()
+    public function getMessageList(): array
     {
-        $output =  array();
+        $output =  [];
         if ($this->CreatedCount()) {
             $output['created'] = _t(
                 'SilverStripe\\Dev\\BulkLoader.IMPORTEDRECORDS',
                 "Imported {count} new records.",
-                array('count' => $this->CreatedCount())
+                ['count' => $this->CreatedCount()]
             );
         }
         if ($this->UpdatedCount()) {
             $output['updated'] = _t(
                 'SilverStripe\\Dev\\BulkLoader.UPDATEDRECORDS',
                 "Updated {count} records.",
-                array('count' => $this->UpdatedCount())
+                ['count' => $this->UpdatedCount()]
             );
         }
         if ($this->DeletedCount()) {
             $output['deleted'] =  _t(
                 'SilverStripe\\Dev\\BulkLoader.DELETEDRECORDS',
                 "Deleted {count} records.",
-                array('count' => $this->DeletedCount())
+                ['count' => $this->DeletedCount()]
             );
         }
-        if ($this->SkippedCount()) {
+        if ($this->SkippedCount() !== 0) {
             $output['skipped'] =  _t(
                 'SilverStripe\\Dev\\BulkLoader.SKIPPEDRECORDS',
                 "Skipped {count} bad records.",
-                array('count' => $this->SkippedCount())
+                ['count' => $this->SkippedCount()]
             );
         }
 
@@ -79,25 +75,23 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
     }
 
     /**
-     * Genenrate a human-readable result message.
-     * @return string
+     * Genenrate a human-readable result message
      */
-    public function getMessage()
+    public function getMessage(): string
     {
         return implode("\n", $this->getMessageList());
     }
 
     /**
-     * Provide a useful message type, based on result.
-     * @return string
+     * Provide a useful message type, based on result
      */
-    public function getMessageType()
+    public function getMessageType(): string
     {
         $type = "bad";
-        if ($this->Count()) {
+        if ($this->Count() !== 0) {
             $type = "good";
         }
-        if ($this->SkippedCount()) {
+        if ($this->SkippedCount() !== 0) {
             $type= "warning";
         }
 
@@ -107,21 +101,18 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
     /**
      * Returns all created objects. Each object might
      * contain specific importer feedback in the "_BulkLoaderMessage" property.
-     * @return \SilverStripe\ORM\ArrayList
      */
-    public function getCreated()
+    public function getCreated(): ArrayList
     {
         return $this->mapToArrayList($this->created);
     }
 
     /**
      * Return all updated objects
-     *
-     * @return \SilverStripe\ORM\ArrayList
      */
-    public function getUpdated()
+    public function getUpdated(): ArrayList
     {
-        $set = new ArrayList();
+        $set = ArrayList::create();
         foreach ($this->updated as $arrItem) {
             $set->push(ArrayData::create($arrItem));
         }
@@ -130,11 +121,10 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
 
     /**
      * Return all deleted objects
-     * @return \SilverStripe\ORM\ArrayList
      */
-    public function getDeleted()
+    public function getDeleted(): ArrayList
     {
-        $set = new ArrayList();
+        $set = ArrayList::create();
         foreach ($this->deleted as $arrItem) {
             $set->push(ArrayData::create($arrItem));
         }
@@ -143,53 +133,52 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
 
     /**
      * Prepare the boby for an email or build task
-     * @return \SilverStripe\ORM\ArrayList
      */
-    public function getData()
+    public function getData(): ArrayList
     {
-        $data = new ArrayList();
+        $data = ArrayList::create();
         if ($this->CreatedCount()) {
-            $data->push(ArrayData::create(array("Title" => _t('Consumer.CREATED', 'Created'))));
+            $data->push(ArrayData::create(["Title" => _t('Consumer.CREATED', 'Created')]));
             $data->merge($this->getCreated());
         }
         if ($this->UpdatedCount()) {
-            $data->push(ArrayData::create(array("Title" => _t('Consumer.UPDATED', 'Updated'))));
+            $data->push(ArrayData::create(["Title" => _t('Consumer.UPDATED', 'Updated')]));
             $data->merge($this->getUpdated());
         }
         if ($this->DeletedCount()) {
-            $data->push(ArrayData::create(array("Title" => _t('Consumer.DELETED', 'Deleted'))));
+            $data->push(ArrayData::create(["Title" => _t('Consumer.DELETED', 'Deleted')]));
             $data->merge($this->$this->getDeleted());
         }
         return $data;
     }
 
     /**
-     * @param \SilverStripe\ORM\DataObject $obj
+     * @param DataObject $obj
      * @param string $message
      */
-    public function addCreated($obj, $message = null)
+    public function addCreated($obj, $message = ''): void
     {
         $this->created[] = $this->lastChange = $this->createResult($obj, $message);
         $this->lastChange['ChangeType'] = 'created';
     }
 
     /**
-     * @param \SilverStripe\ORM\DataObject $obj
+     * @param DataObject $obj
      * @param string $message
      */
-    public function addUpdated($obj, $message = null, $additionalFields = null)
+    public function addUpdated($obj, $message = '', $additionalFields = null): void
     {
         if ($changedFields = $this->getChangedFields($obj)) {
             // create additional fields to include with results
-            $extra_data = array();
+            $extra_data = [];
             foreach ($additionalFields as $field) {
                 $extra_data[$field] = $obj->{$field};
             }
             $extra_data['_ChangedFields'] = $changedFields;
-            $base = array(
+            $base = [
                 'ID' => $obj->ID,
                 'ClassName' => $obj->class
-            );
+            ];
             if ($message) {
                 $base['Message'] = $message;
             }
@@ -203,10 +192,8 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
 
     /**
      * Modelled on the getChangedFields of DataObject, with the addition of the variable's type
-     * @param \SilverStripe\ORM\DataObject $obj
-     * @return array The before/after changes of each field
      */
-    protected function getChangedFields($obj)
+    protected function getChangedFields(DataObject $obj): array
     {
         $changedFields = $obj->getChangedFields(true, 2);
         foreach ($changedFields as $key => $value) {
@@ -218,10 +205,10 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
     }
 
     /**
-     * @param \SilverStripe\ORM\DataObject $obj
+     * @param DataObject $obj
      * @param string $message
      */
-    public function addDeleted($obj, $message = null)
+    public function addDeleted($obj, $message = ''): void
     {
         $this->deleted[] = $this->lastChange = $this->createResult($obj, $message);
         $this->lastChange['ChangeType'] = 'deleted';
@@ -229,11 +216,8 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
 
     /**
      * Create the Result for Deleted and Created items
-     * @param  \SilverStripe\ORM\DataObject $obj
-     * @param  String $message
-     * @return array
      */
-    protected function createResult($obj, $message)
+    protected function createResult(DataObject $obj, string $message = ''): array
     {
         $data = $obj->toMap();
         $data['_BulkLoaderMessage'] = $message;
@@ -242,11 +226,10 @@ class BulkLoaderResult extends \SilverStripe\Dev\BulkLoader_Result
 
     /**
      * @param $arr array Either the created, updated or deleted items
-     * @return \SilverStripe\ORM\ArrayList
      */
-    protected function mapToArrayList($arr)
+    protected function mapToArrayList($arr): ArrayList
     {
-        $set = new ArrayList();
+        $set = ArrayList::create();
         foreach ($arr as $arrItem) {
             $set->push(ArrayData::create($arrItem));
         }

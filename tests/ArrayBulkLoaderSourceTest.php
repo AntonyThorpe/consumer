@@ -5,14 +5,14 @@ namespace AntonyThorpe\Consumer\Tests;
 use SilverStripe\Dev\SapphireTest;
 use AntonyThorpe\Consumer\ArrayBulkLoaderSource;
 
-class ConsumerArrayBulkLoaderSourceTest extends SapphireTest
+class ArrayBulkLoaderSourceTest extends SapphireTest
 {
-    public function testIterator()
+    public function testIterator(): void
     {
-        $data = array(
-            array("First" => 1),
-            array("First" => 2)
-        );
+        $data = [
+            ["First" => 1],
+            ["First" => 2]
+        ];
         $source = new ArrayBulkLoaderSource($data);
         $iterator = $source->getIterator();
         $count = 0;

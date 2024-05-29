@@ -3,18 +3,19 @@
 namespace AntonyThorpe\Consumer\Tests;
 
 use SilverStripe\Dev\SapphireTest;
-use AntonyThorpe\Consumer\Tests\User;
+use AntonyThorpe\Consumer\Tests\Loader\UserBulkLoader;
+use AntonyThorpe\Consumer\Tests\Model\User;
 
 class BulkLoaderUpsertManyRecordsTest extends SapphireTest
 {
-    protected static $fixture_file = array('fixtures/User.yml');
+    protected static $fixture_file = ['Fixtures/User.yml'];
 
     protected static $extra_dataobjects = [User::class];
 
-    public function testUpsertManyRecords()
+    public function testUpsertManyRecords(): void
     {
-        $apidata = json_decode($this->jsondata_to_upsert, true);
-        $results = UserBulkLoader::create('AntonyThorpe\Consumer\Tests\User')->upsertManyRecords($apidata);
+        $apidata = (array) json_decode($this->jsondata_to_upsert, true);
+        $results = UserBulkLoader::create(User::class)->upsertManyRecords($apidata);
 
         // Check Results
         $this->assertEquals($results->CreatedCount(), 1);
@@ -68,10 +69,10 @@ class BulkLoaderUpsertManyRecordsTest extends SapphireTest
         );
     }
 
-    public function testUpsertManyRecordsWithPreview()
+    public function testUpsertManyRecordsWithPreview(): void
     {
-        $apidata = json_decode($this->jsondata_to_upsert, true);
-        UserBulkLoader::create('AntonyThorpe\Consumer\Tests\User')->upsertManyRecords($apidata, true);
+        $apidata = (array) json_decode($this->jsondata_to_upsert, true);
+        UserBulkLoader::create(User::class)->upsertManyRecords($apidata, true);
 
         $remains = User::get()->find('Email', 'Sincere@april.biz');
         $this->assertSame(

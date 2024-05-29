@@ -5,19 +5,21 @@ namespace AntonyThorpe\Consumer\Tests;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\Dev\SapphireTest;
-use AntonyThorpe\Consumer\Tests\User;
-use AntonyThorpe\Consumer\Tests\UserBulkLoader;
+use AntonyThorpe\Consumer\Tests\Loader\UserBulkLoader;
+use AntonyThorpe\Consumer\Tests\Model\User;
 
 class BulkLoaderClearAbsentRecordsTest extends SapphireTest
 {
-    protected static $fixture_file = ['fixtures/User.yml'];
+    protected static $fixture_file = ['Fixtures/User.yml'];
+
+    protected $usesDatabase = true;
 
     protected static $extra_dataobjects = [User::class];
 
-    public function testClearAbsentRecords()
+    public function testClearAbsentRecords(): void
     {
-        $apidata = json_decode($this->jsondata, true);
-        $results = UserBulkLoader::create('AntonyThorpe\Consumer\Tests\User')->clearAbsentRecords($apidata, 'guid', 'Guid');
+        $apidata = (array) json_decode($this->jsondata, true);
+        $results = UserBulkLoader::create(User::class)->clearAbsentRecords($apidata, 'guid', 'Guid');
 
         // Check Results
         $this->assertEquals($results->CreatedCount(), 0);
@@ -42,20 +44,20 @@ class BulkLoaderClearAbsentRecordsTest extends SapphireTest
         $obj = User::get()->find('Email', 'Sincere@april.biz');
         $this->assertSame(
             '1',
-            (string)$obj->Guid,
+            $obj->Guid,
             'Sincere@april.biz Should not have changed the Guid field'
         );
     }
 
-    public function testClearAbsentRecordsWithPreview()
+    public function testClearAbsentRecordsWithPreview(): void
     {
-        $apidata = json_decode($this->jsondata, true);
-        UserBulkLoader::create('AntonyThorpe\Consumer\Tests\User')->clearAbsentRecords($apidata, 'guid', 'Guid', true);
+        $apidata = (array) json_decode($this->jsondata, true);
+        UserBulkLoader::create(User::class)->clearAbsentRecords($apidata, 'guid', 'Guid', true);
 
         $item = User::get()->find('Email', 'LocalOnly@local.net');
         $this->assertSame(
             '99999',
-            (string)$item->Guid,
+            $item->Guid,
             'LocalOnly@local.net Guid property not updated'
         );
     }

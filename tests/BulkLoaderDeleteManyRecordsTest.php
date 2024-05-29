@@ -3,23 +3,24 @@
 namespace AntonyThorpe\Consumer\Tests;
 
 use SilverStripe\Dev\SapphireTest;
-use AntonyThorpe\Consumer\Tests\User;
+use AntonyThorpe\Consumer\Tests\Loader\UserBulkLoader;
+use AntonyThorpe\Consumer\Tests\Model\User;
 
 class BulkLoaderDeleteManyRecordsTest extends SapphireTest
 {
-    protected static $fixture_file = ['fixtures/User.yml'];
+    protected static $fixture_file = ['Fixtures/User.yml'];
 
     protected static $extra_dataobjects = [User::class];
 
-    public function testDeleteManyRecords()
+    public function testDeleteManyRecords(): void
     {
         $shanna = User::get()->find('Email', 'Shanna@melissa.tv');
         $nathan = User::get()->find('Email', 'Nathan@yesenia.net');
         $this->assertTrue($shanna->exists(), 'Shanna exists in User');
         $this->assertTrue($nathan->exists(), 'Nathan exists in User');
 
-        $apidata = json_decode($this->jsondata_to_delete, true);
-        $results = UserBulkLoader::create('AntonyThorpe\Consumer\Tests\User')->deleteManyRecords($apidata);
+        $apidata = (array) json_decode($this->jsondata_to_delete, true);
+        $results = UserBulkLoader::create(User::class)->deleteManyRecords($apidata);
 
         // Check Results
         $this->assertEquals($results->CreatedCount(), 0);
@@ -69,11 +70,11 @@ class BulkLoaderDeleteManyRecordsTest extends SapphireTest
         );
     }
 
-    public function testDeleteManyWithPreview()
+    public function testDeleteManyWithPreview(): void
     {
         $original_count = User::get()->count();
-        $apidata = json_decode($this->jsondata_to_delete, true);
-        UserBulkLoader::create('AntonyThorpe\Consumer\Tests\User')->deleteManyRecords($apidata, true);
+        $apidata = (array) json_decode($this->jsondata_to_delete, true);
+        UserBulkLoader::create(User::class)->deleteManyRecords($apidata, true);
 
         $this->assertEquals(
             $original_count,

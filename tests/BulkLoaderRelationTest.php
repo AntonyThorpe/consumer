@@ -3,17 +3,15 @@
 namespace AntonyThorpe\Consumer\Tests;
 
 use SilverStripe\Dev\SapphireTest;
-use SilverStripe\Dev\TestOnly;
-use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\ArrayList;
 use AntonyThorpe\Consumer\BulkLoader;
 use AntonyThorpe\Consumer\ArrayBulkLoaderSource;
-use AntonyThorpe\Consumer\Tests\CourseSelection;
-use AntonyThorpe\Consumer\Tests\Course;
+use AntonyThorpe\Consumer\Tests\Model\CourseSelection;
+use AntonyThorpe\Consumer\Tests\Model\Course;
 
 class BulkLoaderRelationTest extends SapphireTest
 {
-    protected static $fixture_file = 'fixtures/BulkLoaderRelationTest.yml';
+    protected static $fixture_file = ['Fixtures/BulkLoaderRelationTest.yml'];
 
     protected static $extra_dataobjects = [
         Course::class,
@@ -26,15 +24,15 @@ class BulkLoaderRelationTest extends SapphireTest
     public function setUp(): void
     {
         parent::setUp();
-        $data = array(
+        $data = [
              //unlinked relation, no record
-            array("Course.Title" => "Math 101", "Term" => 1),
+            ["Course.Title" => "Math 101", "Term" => 1],
              //existing relation and record
-            array("Course.Title" => "Tech 102", "Term" => 1),
+            ["Course.Title" => "Tech 102", "Term" => 1],
              //relation does not exist, no record
-            array("Course.Title" => "Geometry 722", "Term" => 1)
-        );
-        $this->loader = new BulkLoader('\AntonyThorpe\Consumer\Tests\CourseSelection');
+            ["Course.Title" => "Geometry 722", "Term" => 1]
+        ];
+        $this->loader = BulkLoader::create(CourseSelection::class);
         $this->loader->setSource(
             new ArrayBulkLoaderSource($data)
         );
@@ -44,7 +42,7 @@ class BulkLoaderRelationTest extends SapphireTest
      * This default behaviour should act the same as
      * testLinkAndCreateRelations
      */
-    public function testEmptyBehaviour()
+    public function testEmptyBehaviour(): void
     {
         $results = $this->loader->load();
         $this->assertEquals(
@@ -64,12 +62,12 @@ class BulkLoaderRelationTest extends SapphireTest
         );
     }
 
-    public function testLinkAndCreateRelations()
+    public function testLinkAndCreateRelations(): void
     {
-        $this->loader->transforms['Course.Title'] = array(
+        $this->loader->transforms['Course.Title'] = [
             'link' => true,
             'create' => true
-        );
+        ];
         $results = $this->loader->load();
         $this->assertEquals(
             3,
@@ -88,12 +86,12 @@ class BulkLoaderRelationTest extends SapphireTest
         );
     }
 
-    public function testNoRelations()
+    public function testNoRelations(): void
     {
-        $this->loader->transforms['Course.Title'] = array(
+        $this->loader->transforms['Course.Title'] = [
             'link' => false,
             'create' => false
-        );
+        ];
         $results = $this->loader->load();
         $this->assertEquals(
             3,
@@ -112,12 +110,12 @@ class BulkLoaderRelationTest extends SapphireTest
         );
     }
 
-    public function testOnlyLinkRelations()
+    public function testOnlyLinkRelations(): void
     {
-        $this->loader->transforms['Course.Title'] = array(
+        $this->loader->transforms['Course.Title'] = [
             'link' => true,
             'create' => false
-        );
+        ];
         $results = $this->loader->load();
         $this->assertEquals(
             3,
@@ -137,12 +135,12 @@ class BulkLoaderRelationTest extends SapphireTest
         );
     }
 
-    public function testOnlyCreateUniqueRelations()
+    public function testOnlyCreateUniqueRelations(): void
     {
-        $this->loader->transforms['Course.Title'] = array(
+        $this->loader->transforms['Course.Title'] = [
             'link' => false,
             'create' => true
-        );
+        ];
         $results = $this->loader->load();
         $this->assertEquals(
             3,
@@ -161,15 +159,15 @@ class BulkLoaderRelationTest extends SapphireTest
         );
     }
 
-    public function testRelationDuplicateCheck()
+    public function testRelationDuplicateCheck(): void
     {
-        $this->loader->transforms['Course.Title'] = array(
+        $this->loader->transforms['Course.Title'] = [
             'link' => true,
             'create' => true
-        );
-        $this->loader->duplicateChecks = array(
+        ];
+        $this->loader->duplicateChecks = [
             "Course.Title"
-        );
+        ];
         $results = $this->loader->load();
         $this->assertEquals(2, $results->CreatedCount(), "2 created");
         $this->assertEquals(0, $results->SkippedCount(), "0 skipped");
@@ -178,14 +176,14 @@ class BulkLoaderRelationTest extends SapphireTest
         //$this->markTestIncomplete("test using {RelationName}ID and {RelationName}");
     }
 
-    public function testRelationList()
+    public function testRelationList(): void
     {
-        $list = new ArrayList();
-        $this->loader->transforms['Course.Title'] = array(
+        $list = ArrayList::create();
+        $this->loader->transforms['Course.Title'] = [
             'create' => true,
             'link' => true,
             'list' => $list
-        );
+        ];
         $results = $this->loader->load();
         $this->assertEquals(3, $results->CreatedCount(), "3 records created");
         $this->assertEquals(3, $list->count(), "3 relations created");
