@@ -4,6 +4,7 @@
 	"type": "silverstripe-vendormodule",
 	"keywords": ["Silverstripe", "BulkLoader", "JSON", "XML"],
 	"require": {
+        "php": "^8.1",
 		"silverstripe/framework": "^5.0.0"
 	},
     "require-dev": {
@@ -11,7 +12,11 @@
 	},
     "autoload": {
         "psr-4": {
-            "AntonyThorpe\\Consumer\\": "src/",
+            "AntonyThorpe\\Consumer\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "AntonyThorpe\\Consumer\\Tests\\": "tests/"
         }
     },
