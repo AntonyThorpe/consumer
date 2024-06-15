@@ -274,7 +274,7 @@ class BulkLoader extends \SilverStripe\Dev\BulkLoader
                 $obj->write();
 
                 if ($obj instanceof SiteTree && ($obj->isPublished() || $this->publishPages)) {
-                    $obj->publish('Stage', 'Live');
+                    $obj->copyVersionToStage('Stage', 'Live');
                 }
 
                 $obj->flushCache(); // avoid relation caching confusion
